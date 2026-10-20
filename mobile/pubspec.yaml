@@ -1,0 +1,55 @@
+name: mobile
+description: "Aplikasi Smart Greenhouse Pertanian - TaniGreen"
+publish_to: 'none'
+version: 0.1.0+1
+
+environment:
+  sdk: ^3.5.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # State Management & Utilitas Dasar
+  provider: ^6.1.2
+  http: ^1.2.2
+  flutter_dotenv: ^5.2.1
+  shared_preferences: ^2.3.2
+  intl: ^0.19.0
+
+  # Database Lokal (FR-03)
+  sqflite: ^2.4.0
+  path: ^1.9.0
+
+  # Keamanan, Biometrik & Hash SHA-256 (FR-01, FR-02, FR-13)
+  local_auth: ^2.3.0
+  crypto: ^3.0.5
+
+  # Peta OSM & GPS (FR-04)
+  flutter_map: ^7.0.2
+  latlong2: ^0.9.1
+  geolocator: ^13.0.1
+
+  # Konversi Zona Waktu Offline (FR-07)
+  timezone: ^0.9.4
+
+  # AI Suara ke Teks & Kamera/Galeri Profil (FR-05, FR-09)
+  speech_to_text: ^7.0.0
+  image_picker: ^1.1.2
+
+  # Notifikasi Lokal tanpa Firebase (FR-12)
+  flutter_local_notifications: ^18.0.1
+
+  cupertino_icons: ^1.0.8
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+
+flutter:
+  uses-material-design: true
+
+  # Daftarkan file .env agar bisa dibaca oleh aplikasi
+  assets:
+    - .env
