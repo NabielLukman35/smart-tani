@@ -23,6 +23,7 @@ class DatabaseHelper {
       version: 2, // Naik ke versi 2 agar tabel baru otomatis ter-create
       onCreate: _createDB,
       onUpgrade: _upgradeDB,
+      onOpen: (db) async => await _seedInitialVarietas(db),
     );
   }
 
@@ -43,11 +44,13 @@ class DatabaseHelper {
     ''');
 
     await _createRemainingTables(db);
+    await _seedInitialVarietas(db);
   }
 
   Future<void> _upgradeDB(Database db, int oldVersion, int newVersion) async {
     if (oldVersion < 2) {
       await _createRemainingTables(db);
+      await _seedInitialVarietas(db);
     }
   }
 
@@ -170,6 +173,55 @@ class DatabaseHelper {
         waktu TEXT NOT NULL
       )
     ''');
+  }
+
+  /// Data awal master varietas tanaman unggul (fokus melon dan hortikultura sesuai PRD)
+  Future<void> _seedInitialVarietas(Database db) async {
+    try {
+      final count = Sqflite.firstIntValue(
+        await db.rawQuery('SELECT COUNT(*) FROM varietas'),
+      ) ?? 0;
+      if (count == 0) {
+        final initialData = [
+          {
+            'nama_varietas': 'Melon Golden Emerald',
+            'deskripsi': 'Kulit kuning emas dengan daging renyah manis hingga tingkat brix 14%.',
+            'panduan_perawatan': 'pH optimal 6.2 - 6.8, suhu 24 - 30°C. Berikan kalium tinggi saat fase pembesaran buah.',
+            'estimasi_umur': 70,
+            'foto_path': null,
+            'sync_status': 'Tersinkron',
+          },
+          {
+            'nama_varietas': 'Tomat Cherry Ruby',
+            'deskripsi': 'Rasa manis segar dengan kandungan likopen tinggi, sangat tahan serangan jamur daun.',
+            'panduan_perawatan': 'pH optimal 6.0 - 6.8, suhu 22 - 28°C. Berikan kalsium nitrat untuk cegah busuk pantat buah.',
+            'estimasi_umur': 65,
+            'foto_path': null,
+            'sync_status': 'Tersinkron',
+          },
+          {
+            'nama_varietas': 'Selada Romaine Hijau',
+            'deskripsi': 'Tekstur renyah cocok untuk hidroponik sistem NFT & DFT dengan sirkulasi nutrisi stabil.',
+            'panduan_perawatan': 'pH optimal 5.8 - 6.5, suhu 18 - 25°C. Jaga sirkulasi oksigen terlarut dalam tandon.',
+            'estimasi_umur': 35,
+            'foto_path': null,
+            'sync_status': 'Tersinkron',
+          },
+          {
+            'nama_varietas': 'Cabai Rawit Hibrida',
+            'deskripsi': 'Tingkat kepedasan tinggi dan produktivitas lebat sepanjang tahun.',
+            'panduan_perawatan': 'pH optimal 6.0 - 7.0, suhu 25 - 32°C. Pantau serangan kutu kebul dengan sticky trap.',
+            'estimasi_umur': 80,
+            'foto_path': null,
+            'sync_status': 'Tersinkron',
+          },
+        ];
+
+        for (var item in initialData) {
+          await db.insert('varietas', item);
+        }
+      }
+    } catch (_) {}
   }
 
   // ===========================================================================
@@ -299,6 +351,23 @@ class DatabaseHelper {
       WHERE g.pengguna_id = ?
       ORDER BY t.id DESC
     ''', [userId]);
+  }
+
+  /// FR-11: Pencarian komprehensif greenhouse dan tanaman yang dimiliki user
+  Future<List<Map<String, dynamic>>> searchGreenhouseAndPlants(int userId, String query) async {
+    final db = await instance.database;
+    final cleanQuery = '%${query.trim().toLowerCase()}%';
+    return await db.rawQuery('''
+      SELECT g.id, g.nama_greenhouse AS judul, g.alamat AS subjudul, g.status, 'Greenhouse' AS kategori, 'Lahan' AS tag
+      FROM greenhouse g
+      WHERE g.pengguna_id = ? AND (LOWER(g.nama_greenhouse) LIKE ? OR LOWER(g.alamat) LIKE ?)
+      UNION ALL
+      SELECT t.id, v.nama_varietas AS judul, ('Di: ' || g.nama_greenhouse) AS subjudul, t.status, 'Tanaman' AS kategori, ('Hama: ' || t.tingkat_hama) AS tag
+      FROM tanaman t
+      INNER JOIN greenhouse g ON t.greenhouse_id = g.id
+      LEFT JOIN varietas v ON t.varietas_id = v.id
+      WHERE g.pengguna_id = ? AND (LOWER(v.nama_varietas) LIKE ? OR LOWER(t.status) LIKE ? OR LOWER(t.tingkat_hama) LIKE ?)
+    ''', [userId, cleanQuery, cleanQuery, userId, cleanQuery, cleanQuery, cleanQuery]);
   }
 
   // ===========================================================================

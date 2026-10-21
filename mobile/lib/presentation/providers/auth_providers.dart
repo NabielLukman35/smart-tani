@@ -30,6 +30,17 @@ class AuthProvider extends ChangeNotifier {
     return user;
   }
 
+  /// Memperbarui data pengguna terkini dari SQLite (misal saldo token setelah kuis)
+  Future<void> refreshCurrentUser() async {
+    if (_currentUser?.id != null) {
+      final user = await DatabaseHelper.instance.getUserById(_currentUser!.id!);
+      if (user != null) {
+        _currentUser = user;
+        notifyListeners();
+      }
+    }
+  }
+
   /// FR-02: Autentikasi Biometrik untuk membuka sesi tersimpan
   Future<bool> loginWithBiometric() async {
     if (_currentUser == null) return false;

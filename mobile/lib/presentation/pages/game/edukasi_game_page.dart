@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../providers/auth_providers.dart';
 import '../../widgets/custom_sub_app_bar.dart';
+import '../../../data/local_db/database_helper.dart';
 
 class EdukasiGamePage extends StatefulWidget {
   const EdukasiGamePage({super.key});
@@ -10,36 +13,77 @@ class EdukasiGamePage extends StatefulWidget {
 }
 
 class _EdukasiGamePageState extends State<EdukasiGamePage> {
-  int _score = 120;
+  int _score = 0;
+  int _highScore = 0;
   int? _selectedOption;
   bool _answered = false;
+  bool _isLoading = true;
 
-  void _answerQuestion(int index) {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _initGameData());
+  }
+
+  Future<void> _initGameData() async {
+    final user = context.read<AuthProvider>().currentUser;
+    final userId = user?.id ?? 1;
+    final high = await DatabaseHelper.instance.getHighScore(userId);
+
+    if (mounted) {
+      setState(() {
+        _highScore = high;
+        _score = high > 0 ? high : 100;
+        _isLoading = false;
+      });
+    }
+  }
+
+  Future<void> _answerQuestion(int index) async {
     if (_answered) return;
+
+    final user = context.read<AuthProvider>().currentUser;
+    final userId = user?.id ?? 1;
+
     setState(() {
       _selectedOption = index;
       _answered = true;
       if (index == 1) {
         _score += 15;
+        if (_score > _highScore) _highScore = _score;
       }
     });
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          index == 1
-              ? 'Jawaban Benar! +15 Poin Petani didapatkan.'
-              : 'Jawaban Belum Tepat. pH ideal sayuran daun adalah 5.8 - 6.5.',
-          style: const TextStyle(color: AppTheme.darkForest, fontWeight: FontWeight.w600),
+    if (index == 1) {
+      // Simpan skor ke SQLite (FR-10) & Tambah token reward (FR-13)
+      await DatabaseHelper.instance.insertSkorGame(userId, _score);
+      await DatabaseHelper.instance.addRewardToken(userId, 15);
+      if (mounted) {
+        await context.read<AuthProvider>().refreshCurrentUser();
+      }
+    }
+
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            index == 1
+                ? 'Jawaban Benar! +15 Poin & +15 Token Petani tersimpan di SQLite.'
+                : 'Jawaban Belum Tepat. pH ideal sayuran daun adalah 5.8 - 6.5.',
+            style: const TextStyle(color: AppTheme.darkForest, fontWeight: FontWeight.w600),
+          ),
+          backgroundColor: index == 1 ? AppTheme.neonLime : const Color(0xFFFF5252),
+          behavior: SnackBarBehavior.floating,
         ),
-        backgroundColor: index == 1 ? AppTheme.neonLime : const Color(0xFFFF5252),
-        behavior: SnackBarBehavior.floating,
-      ),
-    );
+      );
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    final user = context.watch<AuthProvider>().currentUser;
+    final tokenCount = user?.saldoToken ?? 0;
+
     return Scaffold(
       body: Container(
         width: double.infinity,
@@ -50,7 +94,7 @@ class _EdukasiGamePageState extends State<EdukasiGamePage> {
             children: [
               CustomSubAppBar(
                 title: 'Edukasi Game',
-                subtitle: 'Kuis Agronomi & Gamifikasi Token Petani',
+                subtitle: 'Kuis Agronomi & Gamifikasi Token (FR-10, FR-13)',
                 trailing: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                   decoration: BoxDecoration(
@@ -63,7 +107,7 @@ class _EdukasiGamePageState extends State<EdukasiGamePage> {
                       const Icon(Icons.stars_rounded, color: Colors.amber, size: 16),
                       const SizedBox(width: 4),
                       Text(
-                        '$_score Poin',
+                        '$tokenCount Token',
                         style: const TextStyle(
                           color: Colors.amber,
                           fontWeight: FontWeight.w800,
@@ -75,154 +119,157 @@ class _EdukasiGamePageState extends State<EdukasiGamePage> {
                 ),
               ),
               Expanded(
-                child: SingleChildScrollView(
-                  physics: const BouncingScrollPhysics(),
-                  padding: const EdgeInsets.all(20),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Banner Level
-                      Container(
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          gradient: const LinearGradient(
-                            colors: [Color(0xFF2E1C1A), Color(0xFF1C1210), Color(0xFF0C241C)],
-                          ),
-                          borderRadius: BorderRadius.circular(18),
-                          border: Border.all(
-                            color: const Color(0xFFFF5252).withValues(alpha: 0.4),
-                          ),
-                        ),
-                        child: Row(
+                child: _isLoading
+                    ? const Center(child: CircularProgressIndicator(color: AppTheme.neonLime))
+                    : SingleChildScrollView(
+                        physics: const BouncingScrollPhysics(),
+                        padding: const EdgeInsets.all(20),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
+                            // Banner Skor & Level
                             Container(
-                              padding: const EdgeInsets.all(12),
+                              padding: const EdgeInsets.all(16),
                               decoration: BoxDecoration(
-                                color: const Color(0xFFFF5252).withValues(alpha: 0.2),
-                                borderRadius: BorderRadius.circular(14),
+                                gradient: const LinearGradient(
+                                  colors: [Color(0xFF2E1C1A), Color(0xFF1C1210), Color(0xFF0C241C)],
+                                ),
+                                borderRadius: BorderRadius.circular(18),
+                                border: Border.all(
+                                  color: const Color(0xFFFF5252).withValues(alpha: 0.4),
+                                ),
                               ),
-                              child: const Icon(
-                                Icons.sports_esports_rounded,
-                                color: Color(0xFFFF5252),
-                                size: 28,
-                              ),
-                            ),
-                            const SizedBox(width: 14),
-                            const Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
+                              child: Row(
                                 children: [
-                                  Text(
-                                    'Level 3: Petani Ahli Smart Agro',
-                                    style: TextStyle(
-                                      color: AppTheme.creamWhite,
-                                      fontWeight: FontWeight.w800,
-                                      fontSize: 14,
+                                  Container(
+                                    padding: const EdgeInsets.all(12),
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xFFFF5252).withValues(alpha: 0.2),
+                                      borderRadius: BorderRadius.circular(14),
+                                    ),
+                                    child: const Icon(
+                                      Icons.sports_esports_rounded,
+                                      color: Color(0xFFFF5252),
+                                      size: 28,
                                     ),
                                   ),
-                                  SizedBox(height: 2),
-                                  Text(
-                                    'Jawab kuis harian untuk kumpulkan Token Tani!',
-                                    style: TextStyle(
-                                      color: AppTheme.pastelLime,
-                                      fontSize: 11,
+                                  const SizedBox(width: 14),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        const Text(
+                                          'Petani Cerdas Agro (FR-10)',
+                                          style: TextStyle(
+                                            color: AppTheme.creamWhite,
+                                            fontWeight: FontWeight.w800,
+                                            fontSize: 14,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 2),
+                                        Text(
+                                          'Skor Anda: $_score Poin  •  Tertinggi: $_highScore',
+                                          style: const TextStyle(
+                                            color: AppTheme.pastelLime,
+                                            fontSize: 11.5,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   ),
                                 ],
                               ),
                             ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 24),
+                            const SizedBox(height: 24),
 
-                      // Kuis Card
-                      Container(
-                        padding: const EdgeInsets.all(18),
-                        decoration: BoxDecoration(
-                          color: AppTheme.cardSurface,
-                          borderRadius: BorderRadius.circular(20),
-                          border: Border.all(
-                            color: AppTheme.emeraldGreen.withValues(alpha: 0.4),
-                          ),
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                const Text(
-                                  'Tantangan Hari Ini #04',
-                                  style: TextStyle(
-                                    color: AppTheme.neonLime,
-                                    fontWeight: FontWeight.w700,
-                                    fontSize: 12,
-                                  ),
+                            // Kuis Card
+                            Container(
+                              padding: const EdgeInsets.all(18),
+                              decoration: BoxDecoration(
+                                color: AppTheme.cardSurface,
+                                borderRadius: BorderRadius.circular(20),
+                                border: Border.all(
+                                  color: AppTheme.emeraldGreen.withValues(alpha: 0.4),
                                 ),
-                                Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                                  decoration: BoxDecoration(
-                                    color: Colors.amber.withValues(alpha: 0.15),
-                                    borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      const Text(
+                                        'Tantangan Agronomi #01',
+                                        style: TextStyle(
+                                          color: AppTheme.neonLime,
+                                          fontWeight: FontWeight.w700,
+                                          fontSize: 12,
+                                        ),
+                                      ),
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                                        decoration: BoxDecoration(
+                                          color: Colors.amber.withValues(alpha: 0.15),
+                                          borderRadius: BorderRadius.circular(8),
+                                        ),
+                                        child: const Text(
+                                          '+15 Token Reward',
+                                          style: TextStyle(
+                                            color: Colors.amber,
+                                            fontWeight: FontWeight.w800,
+                                            fontSize: 10.5,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                  child: const Text(
-                                    '+15 Token',
+                                  const SizedBox(height: 10),
+                                  const Text(
+                                    'Berapa rentang pH air nutrisi yang paling optimal untuk pertumbuhan sayuran daun hidroponik (selada, pakcoy)?',
                                     style: TextStyle(
-                                      color: Colors.amber,
-                                      fontWeight: FontWeight.w800,
-                                      fontSize: 10.5,
+                                      color: AppTheme.creamWhite,
+                                      fontWeight: FontWeight.w700,
+                                      fontSize: 14,
+                                      height: 1.35,
                                     ),
                                   ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 10),
-                            const Text(
-                              'Berapa rentang pH air nutrisi yang paling optimal untuk pertumbuhan sayuran daun hidroponik (selada, pakcoy)?',
-                              style: TextStyle(
-                                color: AppTheme.creamWhite,
-                                fontWeight: FontWeight.w700,
-                                fontSize: 14,
-                                height: 1.35,
+                                  const SizedBox(height: 16),
+
+                                  // Pilihan Jawaban
+                                  _buildOption(0, 'A. 4.0 - 5.0 pH (Sangat Asam)'),
+                                  _buildOption(1, 'B. 5.8 - 6.5 pH (Ideal Seimbang)'),
+                                  _buildOption(2, 'C. 7.5 - 8.5 pH (Basa Tinggi)'),
+                                  _buildOption(3, 'D. Di atas 9.0 pH (Alkali)'),
+                                ],
                               ),
                             ),
-                            const SizedBox(height: 16),
+                            const SizedBox(height: 24),
 
-                            // Pilihan Jawaban
-                            _buildOption(0, 'A. 4.0 - 5.0 pH (Sangat Asam)'),
-                            _buildOption(1, 'B. 5.8 - 6.5 pH (Ideal Seimbang)'),
-                            _buildOption(2, 'C. 7.5 - 8.5 pH (Basa Tinggi)'),
-                            _buildOption(3, 'D. Di atas 9.0 pH (Alkali)'),
+                            // Misi Harian
+                            const Text(
+                              'Misi Harian & Reward Token (FR-13)',
+                              style: TextStyle(
+                                color: AppTheme.creamWhite,
+                                fontSize: 14.5,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                            const SizedBox(height: 12),
+                            _buildDailyMission(
+                              title: 'Periksa Suhu Greenhouse',
+                              reward: '+5 Token',
+                              isCompleted: true,
+                            ),
+                            const SizedBox(height: 10),
+                            _buildDailyMission(
+                              title: 'Simulasikan Irigasi Tetes',
+                              reward: '+10 Token',
+                              isCompleted: false,
+                            ),
                           ],
                         ),
                       ),
-                      const SizedBox(height: 24),
-
-                      // Misi Harian
-                      const Text(
-                        'Misi Harian Petani',
-                        style: TextStyle(
-                          color: AppTheme.creamWhite,
-                          fontSize: 14.5,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-                      _buildDailyMission(
-                        title: 'Periksa Suhu Greenhouse',
-                        reward: '+5 Token',
-                        isCompleted: true,
-                      ),
-                      const SizedBox(height: 10),
-                      _buildDailyMission(
-                        title: 'Simulasikan Irigasi Tetes',
-                        reward: '+10 Token',
-                        isCompleted: false,
-                      ),
-                    ],
-                  ),
-                ),
               ),
             ],
           ),
