@@ -23,7 +23,10 @@ class DatabaseHelper {
       version: 2, // Naik ke versi 2 agar tabel baru otomatis ter-create
       onCreate: _createDB,
       onUpgrade: _upgradeDB,
-      onOpen: (db) async => await _seedInitialVarietas(db),
+      onOpen: (db) async {
+        await _seedInitialVarietas(db);
+        await _seedInitialJadwal(db);
+      },
     );
   }
 
@@ -45,6 +48,7 @@ class DatabaseHelper {
 
     await _createRemainingTables(db);
     await _seedInitialVarietas(db);
+    await _seedInitialJadwal(db);
   }
 
   Future<void> _upgradeDB(Database db, int oldVersion, int newVersion) async {
@@ -219,6 +223,57 @@ class DatabaseHelper {
 
         for (var item in initialData) {
           await db.insert('varietas', item);
+        }
+      }
+    } catch (_) {}
+  }
+
+
+  /// Data awal master jadwal perawatan
+  Future<void> _seedInitialJadwal(Database db) async {
+    try {
+      final count = Sqflite.firstIntValue(
+        await db.rawQuery('SELECT COUNT(*) FROM jadwal_perawatan'),
+      ) ?? 0;
+      if (count == 0) {
+        final now = DateTime.now();
+        final initialSchedules = [
+          {
+            'tanaman_id': 1,
+            'jenis_perawatan': 'Pemupukan NPK Cair AB Mix',
+            'waktu_utc': now.add(const Duration(hours: 2)).toUtc().toIso8601String(),
+            'status': 'Prioritas',
+            'catatan': 'Greenhouse A • Tomat Hidroponik',
+            'sync_status': 'Tersinkron',
+          },
+          {
+            'tanaman_id': 2,
+            'jenis_perawatan': 'Pengecekan pH & EC Tandon Nutrisi',
+            'waktu_utc': now.add(const Duration(hours: 6)).toUtc().toIso8601String(),
+            'status': 'Terjadwal',
+            'catatan': 'Greenhouse B • Selada Romaine',
+            'sync_status': 'Tersinkron',
+          },
+          {
+            'tanaman_id': 1,
+            'jenis_perawatan': 'Pemangkasan Tunas Air (Pruning)',
+            'waktu_utc': now.add(const Duration(days: 1)).toUtc().toIso8601String(),
+            'status': 'Mendatang',
+            'catatan': 'Greenhouse A • Melon Golden',
+            'sync_status': 'Tersinkron',
+          },
+          {
+            'tanaman_id': 3,
+            'jenis_perawatan': 'Panen Raya Perdana Batch #2',
+            'waktu_utc': now.add(const Duration(days: 3)).toUtc().toIso8601String(),
+            'status': 'Panen',
+            'catatan': 'Greenhouse C • Cabai Rawit',
+            'sync_status': 'Tersinkron',
+          },
+        ];
+
+        for (var item in initialSchedules) {
+          await db.insert('jadwal_perawatan', item);
         }
       }
     } catch (_) {}
@@ -408,6 +463,25 @@ class DatabaseHelper {
       WHERE g.pengguna_id = ?
       ORDER BY j.waktu_utc ASC
     ''', [userId]);
+  }
+
+  Future<List<Map<String, dynamic>>> getAllJadwalList() async {
+    final db = await instance.database;
+    return await db.rawQuery('''
+      SELECT j.*, 
+             COALESCE(g.nama_greenhouse, 'Greenhouse A') AS nama_greenhouse,
+             COALESCE(v.nama_varietas, 'Melon Golden') AS nama_varietas
+      FROM jadwal_perawatan j
+      LEFT JOIN tanaman t ON j.tanaman_id = t.id
+      LEFT JOIN greenhouse g ON t.greenhouse_id = g.id
+      LEFT JOIN varietas v ON t.varietas_id = v.id
+      ORDER BY j.waktu_utc ASC
+    ''');
+  }
+
+  Future<int> deleteJadwal(int id) async {
+    final db = await instance.database;
+    return await db.delete('jadwal_perawatan', where: 'id = ?', whereArgs: [id]);
   }
 
   Future<int> updateJadwalStatus(int id, String status) async {

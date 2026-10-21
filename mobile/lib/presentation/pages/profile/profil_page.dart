@@ -143,26 +143,6 @@ class ProfilePage extends StatelessWidget {
                                 fontSize: 13,
                               ),
                             ),
-                            const SizedBox(height: 12),
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 12, vertical: 5),
-                              decoration: BoxDecoration(
-                                color: AppTheme.neonLime.withValues(alpha: 0.15),
-                                borderRadius: BorderRadius.circular(20),
-                                border: Border.all(
-                                  color: AppTheme.neonLime.withValues(alpha: 0.4),
-                                ),
-                              ),
-                              child: const Text(
-                                '✓ Petani Terverifikasi',
-                                style: TextStyle(
-                                  color: AppTheme.neonLime,
-                                  fontWeight: FontWeight.w700,
-                                  fontSize: 11,
-                                ),
-                              ),
-                            ),
                           ],
                         ),
                       ),
@@ -274,20 +254,29 @@ class ProfilePage extends StatelessWidget {
                                 Switch(
                                   value: user?.biometrikAktif ?? false,
                                   activeThumbColor: AppTheme.neonLime,
-                                  onChanged: (val) {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                        content: Text(
-                                          val
-                                              ? 'Biometrik diaktifkan untuk akun ini.'
-                                              : 'Biometrik dinonaktifkan.',
-                                          style: const TextStyle(
-                                              color: AppTheme.darkForest),
+                                  activeTrackColor: AppTheme.neonLime.withValues(alpha: 0.4),
+                                  onChanged: (val) async {
+                                    final success = await authProvider.setBiometricEnabled(val);
+                                    if (context.mounted) {
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        SnackBar(
+                                          content: Text(
+                                            success
+                                                ? (val
+                                                    ? 'Autentikasi biometrik berhasil diaktifkan.'
+                                                    : 'Autentikasi biometrik dinonaktifkan.')
+                                                : 'Gagal memperbarui status biometrik.',
+                                            style: const TextStyle(
+                                              color: AppTheme.darkForest,
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                          ),
+                                          backgroundColor: AppTheme.neonLime,
+                                          behavior: SnackBarBehavior.floating,
+                                          duration: const Duration(seconds: 2),
                                         ),
-                                        backgroundColor: AppTheme.neonLime,
-                                        behavior: SnackBarBehavior.floating,
-                                      ),
-                                    );
+                                      );
+                                    }
                                   },
                                 ),
                               ],

@@ -610,38 +610,7 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                           ),
                         ),
 
-                        const SizedBox(height: 16),
 
-                        // Tombol Tambahan: Opsi Masuk Cepat / Google
-                        OutlinedButton.icon(
-                          onPressed: () {
-                            _showSnackBar(
-                              'Fitur Google Auth opsional, silakan masuk langsung menggunakan email & password.',
-                            );
-                          },
-                          icon: const Icon(
-                            Icons.g_mobiledata_rounded,
-                            size: 24,
-                            color: AppTheme.pastelLime,
-                          ),
-                          label: const Text(
-                            'Lanjut dengan Google',
-                            style: TextStyle(
-                              color: AppTheme.pastelLime,
-                              fontSize: 13,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                          style: OutlinedButton.styleFrom(
-                            side: BorderSide(
-                              color: AppTheme.emeraldGreen.withValues(alpha: 0.4),
-                            ),
-                            padding: const EdgeInsets.symmetric(vertical: 12),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                          ),
-                        ),
                       ],
                     ),
                   ),

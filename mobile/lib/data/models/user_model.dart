@@ -21,6 +21,30 @@ class UserModel {
     required this.dibuatPada,
   });
 
+  UserModel copyWith({
+    int? id,
+    String? nama,
+    String? email,
+    String? passwordTerenkripsi,
+    String? salt,
+    String? fotoPath,
+    bool? biometrikAktif,
+    int? saldoToken,
+    String? dibuatPada,
+  }) {
+    return UserModel(
+      id: id ?? this.id,
+      nama: nama ?? this.nama,
+      email: email ?? this.email,
+      passwordTerenkripsi: passwordTerenkripsi ?? this.passwordTerenkripsi,
+      salt: salt ?? this.salt,
+      fotoPath: fotoPath ?? this.fotoPath,
+      biometrikAktif: biometrikAktif ?? this.biometrikAktif,
+      saldoToken: saldoToken ?? this.saldoToken,
+      dibuatPada: dibuatPada ?? this.dibuatPada,
+    );
+  }
+
   Map<String, dynamic> toMap() {
     return {
       'id': id,

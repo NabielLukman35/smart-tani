@@ -1,3 +1,5 @@
+import 'dart:async';
+import 'package:flutter_compass/flutter_compass.dart';
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
@@ -33,6 +35,10 @@ class _GreenhouseMapPageState extends State<GreenhouseMapPage> {
   // Arah Mata Angin & Kompas
   double _compassHeading = 0.0; // Derajat 0 - 360
   String _arahMataAngin = 'Utara (0°)';
+  LatLng? _currentLiveLocation; // Posisi live GPS real-time (ala Gojek)
+  bool _isLiveTrackingFollow = true; // Auto-center kamera saat bergerak
+  StreamSubscription<Position>? _positionStreamSubscription;
+  StreamSubscription<CompassEvent>? _compassSubscription;
 
   @override
   void initState() {
@@ -42,12 +48,54 @@ class _GreenhouseMapPageState extends State<GreenhouseMapPage> {
       if (user?.id != null) {
         context.read<GreenhouseProvider>().loadGreenhouses(user!.id!);
       }
-      _getCurrentLocation();
+      _initLiveTrackingAndSensors();
     });
+  }
+
+  /// FR-04 & Sensor Rubrik PAM: Streaming GPS Realtime ala Gojek & Sensor Kompas Otomatis
+  Future<void> _initLiveTrackingAndSensors() async {
+    await _getCurrentLocation();
+
+    // 1. Live GPS Stream (Update setiap 2 meter)
+    try {
+      const locationSettings = LocationSettings(
+        accuracy: LocationAccuracy.high,
+        distanceFilter: 2,
+      );
+      _positionStreamSubscription = Geolocator.getPositionStream(
+        locationSettings: locationSettings,
+      ).listen((Position pos) {
+        if (!mounted) return;
+        final livePoint = LatLng(pos.latitude, pos.longitude);
+        setState(() {
+          _currentLiveLocation = livePoint;
+          if (_isLiveTrackingFollow) {
+            _mapController.move(livePoint, _mapController.camera.zoom);
+          }
+        });
+      });
+    } catch (e) {
+      debugPrint('Live GPS Stream error: $e');
+    }
+
+    // 2. Hardware Compass Sensor Stream (Otomatis Mengunci Utara)
+    try {
+      _compassSubscription = FlutterCompass.events?.listen((event) {
+        if (event.heading != null && mounted) {
+          setState(() {
+            _updateCompassHeading(event.heading!);
+          });
+        }
+      });
+    } catch (e) {
+      debugPrint('Compass Sensor error: $e');
+    }
   }
 
   @override
   void dispose() {
+    _positionStreamSubscription?.cancel();
+    _compassSubscription?.cancel();
     _searchMapCtrl.dispose();
     super.dispose();
   }
@@ -703,8 +751,16 @@ class _GreenhouseMapPageState extends State<GreenhouseMapPage> {
                       options: MapOptions(
                         initialCenter: _selectedPoint,
                         initialZoom: 15.0,
+                        onPositionChanged: (camera, hasGesture) {
+                          if (hasGesture && _isLiveTrackingFollow) {
+                            setState(() => _isLiveTrackingFollow = false);
+                          }
+                        },
                         onTap: (tapPosition, point) {
-                          setState(() => _selectedPoint = point);
+                          setState(() {
+                            _selectedPoint = point;
+                            _isLiveTrackingFollow = false;
+                          });
                           _updateAddress(point);
                         },
                       ),
@@ -715,6 +771,58 @@ class _GreenhouseMapPageState extends State<GreenhouseMapPage> {
                         ),
                         MarkerLayer(
                           markers: [
+                            // Marker Posisi Live Pengguna (Pulsing Blue Dot ala Gojek)
+                            if (_currentLiveLocation != null)
+                              Marker(
+                                point: _currentLiveLocation!,
+                                width: 50,
+                                height: 50,
+                                child: Stack(
+                                  alignment: Alignment.center,
+                                  children: [
+                                    Container(
+                                      width: 44,
+                                      height: 44,
+                                      decoration: BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        color: const Color(0xFF2196F3).withValues(alpha: 0.25),
+                                        border: Border.all(
+                                          color: const Color(0xFF2196F3).withValues(alpha: 0.6),
+                                          width: 1.5,
+                                        ),
+                                      ),
+                                    ),
+                                    Transform.rotate(
+                                      angle: (_compassHeading * (math.pi / 180)),
+                                      child: Container(
+                                        width: 32,
+                                        height: 32,
+                                        alignment: Alignment.topCenter,
+                                        child: const Icon(
+                                          Icons.navigation_rounded,
+                                          color: Color(0xFF1976D2),
+                                          size: 16,
+                                        ),
+                                      ),
+                                    ),
+                                    Container(
+                                      width: 16,
+                                      height: 16,
+                                      decoration: BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        color: const Color(0xFF1E88E5),
+                                        border: Border.all(color: Colors.white, width: 2.5),
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: Colors.black.withValues(alpha: 0.35),
+                                            blurRadius: 4,
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
                             Marker(
                               point: _selectedPoint,
                               width: 50,
@@ -825,11 +933,47 @@ class _GreenhouseMapPageState extends State<GreenhouseMapPage> {
                                 ),
                               ),
                               const Text(
-                                'Ketuk ganti arah',
+                                'Sensor Otomatis (Utara)',
                                 style: TextStyle(color: AppTheme.textGrey, fontSize: 8.5),
                               ),
                             ],
                           ),
+                        ),
+                      ),
+                    ),
+
+                    // Tombol Recenter / Ikuti Saya ala Gojek
+                    Positioned(
+                      bottom: 16,
+                      right: 16,
+                      child: FloatingActionButton.small(
+                        heroTag: 'recenter_gps_gojek',
+                        backgroundColor: _isLiveTrackingFollow ? AppTheme.neonLime : AppTheme.cardSurface,
+                        foregroundColor: _isLiveTrackingFollow ? AppTheme.darkForest : AppTheme.creamWhite,
+                        elevation: 4,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(14),
+                          side: BorderSide(
+                            color: _isLiveTrackingFollow
+                                ? AppTheme.neonLime
+                                : AppTheme.emeraldGreen.withValues(alpha: 0.4),
+                          ),
+                        ),
+                        onPressed: () {
+                          final target = _currentLiveLocation ?? _selectedPoint;
+                          _mapController.move(target, 16.5);
+                          setState(() => _isLiveTrackingFollow = true);
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('📍 Mode Ikuti Pengguna Aktif (Live Tracking Gojek)'),
+                              duration: Duration(seconds: 1),
+                              behavior: SnackBarBehavior.floating,
+                            ),
+                          );
+                        },
+                        child: Icon(
+                          _isLiveTrackingFollow ? Icons.my_location_rounded : Icons.location_searching_rounded,
+                          size: 20,
                         ),
                       ),
                     ),

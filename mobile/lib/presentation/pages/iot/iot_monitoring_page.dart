@@ -1,3 +1,4 @@
+import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:math';
 import 'package:flutter/material.dart';
 import '../../../core/utils/currency_helper.dart';
@@ -29,6 +30,7 @@ class _IotMonitoringPageState extends State<IotMonitoringPage> {
   String _selectedZone = 'WIB'; // Pilihan FR-07: WIB, WITA, WIT, London
   bool _isLoadingRates = true;
   List<Map<String, dynamic>> _sensorLogs = [];
+  bool _isAutoPeriodicNotification = false;
 
   @override
   void initState() {
@@ -44,8 +46,13 @@ class _IotMonitoringPageState extends State<IotMonitoringPage> {
   Future<void> _initData() async {
     await CurrencyHelper.fetchRates();
     await _loadSensorLogs();
+    final prefs = await SharedPreferences.getInstance();
+    final autoNotif = prefs.getBool('auto_periodic_notification') ?? false;
     if (mounted) {
-      setState(() => _isLoadingRates = false);
+      setState(() {
+        _isAutoPeriodicNotification = autoNotif;
+        _isLoadingRates = false;
+      });
     }
   }
 
@@ -467,6 +474,86 @@ class _IotMonitoringPageState extends State<IotMonitoringPage> {
                                 'Kirim Pengingat Notifikasi Suhu Sekarang (FR-12)',
                                 style: TextStyle(fontWeight: FontWeight.w700, fontSize: 12),
                               ),
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                          // FR-12: Switch Pengingat Otomatis Latar Belakang
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFF102E27),
+                              borderRadius: BorderRadius.circular(14),
+                              border: Border.all(
+                                color: _isAutoPeriodicNotification
+                                    ? AppTheme.neonLime.withValues(alpha: 0.6)
+                                    : AppTheme.emeraldGreen.withValues(alpha: 0.3),
+                              ),
+                            ),
+                            child: Row(
+                              children: [
+                                Icon(
+                                  _isAutoPeriodicNotification ? Icons.alarm_on_rounded : Icons.alarm_off_rounded,
+                                  color: _isAutoPeriodicNotification ? AppTheme.neonLime : AppTheme.textGrey,
+                                  size: 22,
+                                ),
+                                const SizedBox(width: 12),
+                                const Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        'Pengingat Berkala Otomatis',
+                                        style: TextStyle(
+                                          color: AppTheme.creamWhite,
+                                          fontWeight: FontWeight.w700,
+                                          fontSize: 12.5,
+                                        ),
+                                      ),
+                                      Text(
+                                        'Tetap aktif otomatis meski aplikasi ditutup',
+                                        style: TextStyle(
+                                          color: AppTheme.textGrey,
+                                          fontSize: 10.5,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                Switch(
+                                  value: _isAutoPeriodicNotification,
+                                  activeThumbColor: AppTheme.neonLime,
+                                  activeTrackColor: AppTheme.neonLime.withValues(alpha: 0.4),
+                                  onChanged: (val) async {
+                                    setState(() => _isAutoPeriodicNotification = val);
+                                    final prefs = await SharedPreferences.getInstance();
+                                    await prefs.setBool('auto_periodic_notification', val);
+                                    if (val) {
+                                      final curSuhu = latestLog?['suhu'] ?? 28.5;
+                                      final curLembap = latestLog?['kelembapan_tanah'] ?? 65;
+                                      await NotificationService.instance.startPeriodicTelemetryReminder(
+                                          title: '🌿 [Auto-Reminder] $ghName',
+                                          body: '🌡️ Suhu: $curSuhu°C | Kelembaban: $curLembap%',
+                                      );
+                                    } else {
+                                      await NotificationService.instance.stopPeriodicTelemetryReminder();
+                                    }
+                                    if (context.mounted) {
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        SnackBar(
+                                          content: Text(
+                                            val
+                                                ? '✓ Pengingat otomatis diaktifkan! Notifikasi suhu akan berbunyi berkala walau aplikasi keluar.'
+                                                : 'Pengingat berkala otomatis dimatikan.',
+                                            style: const TextStyle(color: AppTheme.darkForest),
+                                          ),
+                                          backgroundColor: AppTheme.neonLime,
+                                          behavior: SnackBarBehavior.floating,
+                                        ),
+                                      );
+                                    }
+                                  },
+                                ),
+                              ],
                             ),
                           ),
                         ],
