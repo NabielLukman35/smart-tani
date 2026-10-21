@@ -37,10 +37,15 @@ dependencies:
   speech_to_text: ^7.0.0
   image_picker: ^1.1.2
 
+  # Google Gemini AI (FR-09)
+  google_generative_ai: ^0.4.6
+
   # Notifikasi Lokal tanpa Firebase (FR-12)
   flutter_local_notifications: ^18.0.1
 
   cupertino_icons: ^1.0.8
+  flutter_compass: ^0.8.1
+  sensors_plus: ^7.1.1
 
 dev_dependencies:
   flutter_test:
@@ -50,6 +55,7 @@ dev_dependencies:
 flutter:
   uses-material-design: true
 
-  # Daftarkan file .env agar bisa dibaca oleh aplikasi
+  # Daftarkan file .env dan aset gambar agar bisa dibaca oleh aplikasi
   assets:
     - assets/.env
+    - assets/images/

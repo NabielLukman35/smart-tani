@@ -166,6 +166,20 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 
+  /// FR-05: Update foto profil pengguna
+  Future<void> updatePhoto(String photoPath) async {
+    if (_currentUser?.id == null) return;
+    await DatabaseHelper.instance.updateUserPhoto(_currentUser!.id!, photoPath);
+    _currentUser = await DatabaseHelper.instance.getUserById(_currentUser!.id!);
+    notifyListeners();
+  }
+
+  Future<void> refreshUser() async {
+    if (_currentUser?.id == null) return;
+    _currentUser = await DatabaseHelper.instance.getUserById(_currentUser!.id!);
+    notifyListeners();
+  }
+
   /// FR-01: Logout & hapus sesi lokal
   Future<void> logout() async {
     final prefs = await SharedPreferences.getInstance();

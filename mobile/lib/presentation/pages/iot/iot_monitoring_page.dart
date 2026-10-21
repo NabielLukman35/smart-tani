@@ -106,6 +106,15 @@ class _IotMonitoringPageState extends State<IotMonitoringPage> {
         'waktu': nowUtc,
       });
 
+      // FR-12: Trigger Notifikasi Lokal Tanpa Firebase
+      try {
+        await NotificationService().showLocalNotification(
+          id: DateTime.now().millisecondsSinceEpoch ~/ 1000,
+          title: '⚠️ Peringatan Sensor: $ghName',
+          body: alerts.join(', '),
+        );
+      } catch (_) {}
+
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
