@@ -53,4 +53,32 @@ class GreenhouseProvider extends ChangeNotifier {
     }
     return 'Koordinat: ${lat.toStringAsFixed(5)}, ${lng.toStringAsFixed(5)} (Offline)';
   }
+
+  /// LBS: Pencarian lokasi menggunakan OpenStreetMap Nominatim Search API
+  Future<List<Map<String, dynamic>>> searchPlaces(String query) async {
+    if (query.trim().isEmpty) return [];
+    try {
+      final url = Uri.parse(
+        'https://nominatim.openstreetmap.org/search?q=${Uri.encodeComponent(query)}&format=json&limit=5&addressdetails=1',
+      );
+      final response = await http.get(
+        url,
+        headers: {
+          'User-Agent': 'TaniGreenApp/1.0 (contact@tanigreen.id)',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final List list = json.decode(response.body);
+        return list.map((item) => {
+          'display_name': item['display_name'] ?? '',
+          'lat': double.parse(item['lat']),
+          'lon': double.parse(item['lon']),
+        }).toList();
+      }
+    } catch (e) {
+      debugPrint('Search location error: $e');
+    }
+    return [];
+  }
 }

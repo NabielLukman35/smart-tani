@@ -2,6 +2,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import '../../../core/utils/currency_helper.dart';
 import '../../../core/utils/timezone_helper.dart';
+import '../../../core/services/notification_service.dart';
 import '../../../data/local_db/database_helper.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../widgets/custom_sub_app_bar.dart';
@@ -56,7 +57,7 @@ class _IotMonitoringPageState extends State<IotMonitoringPage> {
     }
   }
 
-  /// FR-08: Simulasi kiriman data sensor IoT (DHT22, Soil Moisture, LDR)
+  /// FR-08 & FR-12: Simulasi kiriman data sensor IoT + trigger notifikasi status bar
   Future<void> _simulateIncomingSensorData() async {
     final rand = Random();
     final double suhu = double.parse((26 + rand.nextDouble() * 12).toStringAsFixed(1));
@@ -84,8 +85,18 @@ class _IotMonitoringPageState extends State<IotMonitoringPage> {
       alerts.add('Kelembapan tanah kering ($lembapTanah% < $_batasLembapMin%)');
     }
 
+    final ghName = widget.greenhouse['nama_greenhouse'] ?? 'Greenhouse Utama';
+
+    // FR-12: Kirim notifikasi nyata ke status bar Android
+    await NotificationService.instance.showTelemetryNotification(
+      greenhouseName: ghName,
+      suhu: suhu,
+      lembapTanah: lembapTanah,
+      lembapUdara: lembapUdara,
+      cahaya: cahaya,
+    );
+
     if (alerts.isNotEmpty) {
-      final ghName = widget.greenhouse['nama_greenhouse'] ?? 'Greenhouse Utama';
       final pesanNotif = '[PERINGATAN IoT - $ghName] ${alerts.join(', ')}';
       await DatabaseHelper.instance.insertNotifikasi({
         'pengguna_id': widget.userId,
@@ -305,7 +316,7 @@ class _IotMonitoringPageState extends State<IotMonitoringPage> {
                     ),
                     const SizedBox(height: 16),
 
-                    // KARTU FR-08: MONITORING SENSOR IoT
+                    // KARTU FR-08 & FR-12: MONITORING SENSOR IoT & NOTIFIKASI
                     Container(
                       padding: const EdgeInsets.all(18),
                       decoration: BoxDecoration(
@@ -318,13 +329,29 @@ class _IotMonitoringPageState extends State<IotMonitoringPage> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text(
-                            'Status Sensor IoT Terkini (FR-08)',
-                            style: TextStyle(
-                              color: AppTheme.creamWhite,
-                              fontWeight: FontWeight.w800,
-                              fontSize: 14.5,
-                            ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              const Text(
+                                'Status Sensor IoT Terkini (FR-08)',
+                                style: TextStyle(
+                                  color: AppTheme.creamWhite,
+                                  fontWeight: FontWeight.w800,
+                                  fontSize: 14.5,
+                                ),
+                              ),
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                                decoration: BoxDecoration(
+                                  color: AppTheme.neonLime.withValues(alpha: 0.15),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: const Text(
+                                  'IoT Aktif',
+                                  style: TextStyle(color: AppTheme.neonLime, fontSize: 10.5, fontWeight: FontWeight.w700),
+                                ),
+                              ),
+                            ],
                           ),
                           const SizedBox(height: 4),
                           Text(
@@ -395,6 +422,50 @@ class _IotMonitoringPageState extends State<IotMonitoringPage> {
                               label: const Text(
                                 'Ambil / Simulasikan Data IoT Baru',
                                 style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 10),
+                          // FR-12: Tombol Notifikasi Pengingat Suhu
+                          SizedBox(
+                            width: double.infinity,
+                            height: 42,
+                            child: OutlinedButton.icon(
+                              onPressed: () async {
+                                final currentSuhu = (latestLog?['suhu'] as num?)?.toDouble() ?? 28.5;
+                                final currentLembapTanah = (latestLog?['kelembapan_tanah'] as num?)?.toDouble() ?? 60.0;
+                                final currentLembapUdara = (latestLog?['kelembapan_udara'] as num?)?.toDouble() ?? 65.0;
+                                final currentCahaya = (latestLog?['cahaya'] as num?)?.toDouble() ?? 650.0;
+
+                                await NotificationService.instance.showTelemetryNotification(
+                                  greenhouseName: ghName,
+                                  suhu: currentSuhu,
+                                  lembapTanah: currentLembapTanah,
+                                  lembapUdara: currentLembapUdara,
+                                  cahaya: currentCahaya,
+                                );
+
+                                if (context.mounted) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text('Notifikasi pengingat suhu (FR-12) berhasil dikirimkan ke status bar!'),
+                                      backgroundColor: AppTheme.neonLime,
+                                      behavior: SnackBarBehavior.floating,
+                                    ),
+                                  );
+                                }
+                              },
+                              style: OutlinedButton.styleFrom(
+                                foregroundColor: const Color(0xFF00E5FF),
+                                side: const BorderSide(color: Color(0xFF00E5FF)),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
+                              icon: const Icon(Icons.notifications_active_rounded, size: 18),
+                              label: const Text(
+                                'Kirim Pengingat Notifikasi Suhu Sekarang (FR-12)',
+                                style: TextStyle(fontWeight: FontWeight.w700, fontSize: 12),
                               ),
                             ),
                           ),
