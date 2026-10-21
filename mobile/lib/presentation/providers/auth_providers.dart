@@ -41,6 +41,18 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 
+  /// FR-02: Mengaktifkan atau menonaktifkan autentikasi biometrik pengguna
+  Future<bool> setBiometricEnabled(bool isEnabled) async {
+    if (_currentUser == null || _currentUser!.id == null) return false;
+    final rows = await DatabaseHelper.instance.updateBiometricStatus(_currentUser!.id!, isEnabled);
+    if (rows > 0) {
+      _currentUser = _currentUser!.copyWith(biometrikAktif: isEnabled);
+      notifyListeners();
+      return true;
+    }
+    return false;
+  }
+
   /// FR-02: Autentikasi Biometrik untuk membuka sesi tersimpan
   Future<bool> loginWithBiometric() async {
     if (_currentUser == null) return false;
@@ -111,14 +123,14 @@ class AuthProvider extends ChangeNotifier {
       notifyListeners();
       return true;
     } catch (e) {
-      _errorMessage = 'Gagal mendaftar: $e';
+      _errorMessage = 'Terjadi kesalahan saat registrasi: $e';
       _isLoading = false;
       notifyListeners();
       return false;
     }
   }
 
-  /// FR-01: Login dengan verifikasi enkripsi custom
+  /// FR-01: Login pengguna dengan verifikasi hash password
   Future<bool> login({
     required String email,
     required String password,
@@ -132,7 +144,7 @@ class AuthProvider extends ChangeNotifier {
       final user = await DatabaseHelper.instance.getUserByEmail(cleanEmail);
 
       if (user == null) {
-        _errorMessage = 'Akun dengan email ini belum terdaftar.';
+        _errorMessage = 'Akun dengan email ini tidak ditemukan.';
         _isLoading = false;
         notifyListeners();
         return false;

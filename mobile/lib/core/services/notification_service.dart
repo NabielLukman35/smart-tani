@@ -121,6 +121,7 @@ class NotificationService {
   }
 
   /// FR-12: Mengaktifkan Pengingat Berkala Otomatis (Periodic Background Notification)
+  /// Notifikasi ini otomatis tetap berbunyi di latar belakang walau aplikasi ditutup.
   Future<void> startPeriodicTelemetryReminder({
     String title = '🌿 [Pengingat Berkala] Smart Greenhouse',
     String body = '🌡️ Suhu Saat Ini: 28.5°C | Lembap Tanah: 72% | Kondisi Optimal',
@@ -142,8 +143,9 @@ class NotificationService {
     );
 
     try {
+      // Pemicu berkala level OS (Hourly Repeat Interval)
       await _plugin.periodicallyShow(
-        8888,
+        8888, // ID khusus periodic telemetry
         title,
         body,
         RepeatInterval.hourly,
@@ -203,6 +205,7 @@ class NotificationService {
               UILocalNotificationDateInterpretation.absoluteTime,
         );
       } else {
+        // Jika waktu jadwal sudah dekat atau saat ini, tampilkan notifikasi langsung sebagai konfirmasi
         await _plugin.show(
           id,
           '📅 [Jadwal Aktif] $title',
@@ -212,6 +215,7 @@ class NotificationService {
       }
     } catch (e) {
       debugPrint('Error schedule notification: $e');
+      // Fallback
       await _plugin.show(
         id,
         '📅 [Jadwal Tercatat] $title',

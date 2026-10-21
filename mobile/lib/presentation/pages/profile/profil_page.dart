@@ -692,25 +692,28 @@ class _ProfilePageState extends State<ProfilePage> {
                                 Switch(
                                   value: user?.biometrikAktif ?? false,
                                   activeThumbColor: AppTheme.neonLime,
+                                  activeTrackColor: AppTheme.neonLime.withValues(alpha: 0.4),
                                   onChanged: (val) async {
-                                    if (user?.id != null) {
-                                      await DatabaseHelper.instance.updateBiometricStatus(user!.id!, val);
-                                      await authProvider.refreshUser();
-                                      if (context.mounted) {
-                                        ScaffoldMessenger.of(context).showSnackBar(
-                                          SnackBar(
-                                            content: Text(
-                                              val
-                                                  ? 'Biometrik diaktifkan untuk akun ini.'
-                                                  : 'Biometrik dinonaktifkan.',
-                                              style: const TextStyle(
-                                                  color: AppTheme.darkForest),
+                                    final success = await authProvider.setBiometricEnabled(val);
+                                    if (context.mounted) {
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        SnackBar(
+                                          content: Text(
+                                            success
+                                                ? (val
+                                                    ? 'Autentikasi biometrik berhasil diaktifkan.'
+                                                    : 'Autentikasi biometrik dinonaktifkan.')
+                                                : 'Gagal memperbarui status biometrik.',
+                                            style: const TextStyle(
+                                              color: AppTheme.darkForest,
+                                              fontWeight: FontWeight.w600,
                                             ),
-                                            backgroundColor: AppTheme.neonLime,
-                                            behavior: SnackBarBehavior.floating,
                                           ),
-                                        );
-                                      }
+                                          backgroundColor: AppTheme.neonLime,
+                                          behavior: SnackBarBehavior.floating,
+                                          duration: const Duration(seconds: 2),
+                                        ),
+                                      );
                                     }
                                   },
                                 ),
