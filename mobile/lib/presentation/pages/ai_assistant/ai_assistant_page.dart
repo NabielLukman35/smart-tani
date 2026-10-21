@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:speech_to_text/speech_to_text.dart' as stt;
 import '../../../core/services/gemini_services.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../widgets/custom_sub_app_bar.dart';
@@ -13,10 +14,15 @@ class AiAssistantPage extends StatefulWidget {
 class _AiAssistantPageState extends State<AiAssistantPage> {
   final TextEditingController _promptController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
+  final stt.SpeechToText _speech = stt.SpeechToText();
   
+  bool _isListening = false;
+  bool _speechAvailable = false;
+
   final List<_ChatMessage> _messages = [
     const _ChatMessage(
-      text: 'Halo! Saya Asisten Tani berbasis Google Gemini AI.\nTanyakan apa saja seputar diagnosis hama, daun menguning, jadwal pemupukan, atau rekomendasi perawatan greenhouse Anda.',
+      text: 'Halo Petani! Saya Asisten Tani berbasis Google Gemini AI & Smart Agronomy Engine.\n'
+          'Tanyakan apa saja seputar diagnosis hama, daun menguning, jadwal pemupukan NPK, atau rekomendasi perawatan greenhouse Anda.',
       isBot: true,
       time: 'Asisten AI',
     ),
@@ -24,9 +30,71 @@ class _AiAssistantPageState extends State<AiAssistantPage> {
   
   bool _isLoading = false;
 
+  @override
+  void initState() {
+    super.initState();
+    _initSpeechToText();
+  }
+
+  Future<void> _initSpeechToText() async {
+    try {
+      _speechAvailable = await _speech.initialize(
+        onStatus: (status) {
+          if (status == 'notListening' || status == 'done') {
+            if (mounted) setState(() => _isListening = false);
+          }
+        },
+        onError: (_) {
+          if (mounted) setState(() => _isListening = false);
+        },
+      );
+    } catch (_) {
+      _speechAvailable = false;
+    }
+  }
+
+  Future<void> _toggleVoiceRecording() async {
+    if (!_speechAvailable) {
+      await _initSpeechToText();
+    }
+
+    if (_isListening) {
+      await _speech.stop();
+      if (mounted) setState(() => _isListening = false);
+      return;
+    }
+
+    if (_speechAvailable) {
+      if (mounted) setState(() => _isListening = true);
+      await _speech.listen(
+        onResult: (result) {
+          if (mounted) {
+            setState(() {
+              _promptController.text = result.recognizedWords;
+            });
+          }
+        },
+      );
+    } else {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Izin mikrofon belum aktif atau fitur suara tidak tersedia.'),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
+    }
+  }
+
   Future<void> _askGemini([String? customPrompt]) async {
     final query = (customPrompt ?? _promptController.text).trim();
     if (query.isEmpty || _isLoading) return;
+
+    if (_isListening) {
+      await _speech.stop();
+      setState(() => _isListening = false);
+    }
 
     setState(() {
       _messages.add(_ChatMessage(
@@ -46,7 +114,7 @@ class _AiAssistantPageState extends State<AiAssistantPage> {
         _messages.add(_ChatMessage(
           text: result,
           isBot: true,
-          time: 'Gemini 1.5 Flash',
+          time: 'Asisten Tani (Gemini AI)',
         ));
         _isLoading = false;
       });
@@ -70,6 +138,7 @@ class _AiAssistantPageState extends State<AiAssistantPage> {
   void dispose() {
     _promptController.dispose();
     _scrollController.dispose();
+    _speech.stop();
     super.dispose();
   }
 
@@ -85,7 +154,7 @@ class _AiAssistantPageState extends State<AiAssistantPage> {
             children: [
               CustomSubAppBar(
                 title: 'Asisten Tani AI (FR-09)',
-                subtitle: 'Didukung Google Gemini AI',
+                subtitle: 'Didukung Google Gemini & Agronomi Engine',
                 trailing: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                   decoration: BoxDecoration(
@@ -236,13 +305,38 @@ class _AiAssistantPageState extends State<AiAssistantPage> {
                             ),
                             SizedBox(width: 10),
                             Text(
-                              'Gemini AI sedang berpikir...',
+                              'Gemini AI sedang menganalisis...',
                               style: TextStyle(color: AppTheme.pastelLime, fontSize: 11),
                             ),
                           ],
                         ),
                       ),
                     ],
+                  ),
+                ),
+
+              // Listening Voice Status Indicator (FR-05)
+              if (_isListening)
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFE74C3C).withValues(alpha: 0.2),
+                      borderRadius: BorderRadius.circular(14),
+                      border: Border.all(color: const Color(0xFFE74C3C).withValues(alpha: 0.5)),
+                    ),
+                    child: const Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.mic_rounded, color: Color(0xFFFF5252), size: 16),
+                        SizedBox(width: 8),
+                        Text(
+                          'Mendengarkan suara Anda... (Bicara sekarang)',
+                          style: TextStyle(color: Color(0xFFFF8A80), fontSize: 11, fontWeight: FontWeight.w600),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
 
@@ -255,11 +349,12 @@ class _AiAssistantPageState extends State<AiAssistantPage> {
                     _buildPromptChip('Daun melon bercak kuning, solusinya apa?'),
                     _buildPromptChip('Rekomendasi takaran pupuk AB Mix hidroponik'),
                     _buildPromptChip('Cara mengatasi hama kutu kebul'),
+                    _buildPromptChip('Berapa pH ideal tanaman melon?'),
                   ],
                 ),
               ),
 
-              // Input Bar
+              // Input Bar (Input Suara FR-05 & Teks FR-09)
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
@@ -272,6 +367,30 @@ class _AiAssistantPageState extends State<AiAssistantPage> {
                 ),
                 child: Row(
                   children: [
+                    // Tombol Input Suara Mikrofon (FR-05)
+                    GestureDetector(
+                      onTap: _toggleVoiceRecording,
+                      child: Container(
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: _isListening
+                              ? const Color(0xFFFF5252)
+                              : AppTheme.emeraldGreen.withValues(alpha: 0.2),
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: _isListening
+                                ? Colors.white
+                                : AppTheme.neonLime.withValues(alpha: 0.4),
+                          ),
+                        ),
+                        child: Icon(
+                          _isListening ? Icons.mic_rounded : Icons.mic_none_rounded,
+                          color: _isListening ? Colors.white : AppTheme.neonLime,
+                          size: 20,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
                     Expanded(
                       child: Container(
                         padding: const EdgeInsets.symmetric(horizontal: 16),
