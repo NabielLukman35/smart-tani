@@ -47,5 +47,11 @@ app.*.map.json
 # Widget Preview related
 .widget_preview/
 
-# Environment Variables
+# Environment Variables (Root and private local env files)
 .env
+*.env.local
+*.env.production
+
+# Track assets/.env with safe default values for teammates to avoid asset build errors
+!assets/.env
+!*.env.example

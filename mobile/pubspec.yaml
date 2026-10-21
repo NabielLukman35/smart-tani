@@ -52,4 +52,4 @@ flutter:
 
   # Daftarkan file .env agar bisa dibaca oleh aplikasi
   assets:
-    - .env
+    - assets/.env
