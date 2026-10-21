@@ -7,7 +7,6 @@ class NotificationService {
   static final NotificationService instance = NotificationService._init();
   factory NotificationService() => instance;
   NotificationService._init();
-  NotificationService._internal() : this._init();
 
   final FlutterLocalNotificationsPlugin _plugin = FlutterLocalNotificationsPlugin();
   bool _isInitialized = false;
