@@ -580,7 +580,7 @@ class _JadwalTanamPageState extends State<JadwalTanamPage> {
       body: Container(
         width: double.infinity,
         height: double.infinity,
-        decoration: const BoxDecoration(gradient: AppTheme.bgGradient),
+        color: AppTheme.ground,
         child: SafeArea(
           child: Column(
             children: [

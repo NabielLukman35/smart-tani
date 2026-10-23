@@ -199,7 +199,7 @@ class _ProfilePageState extends State<ProfilePage> {
       body: Container(
         width: double.infinity,
         height: double.infinity,
-        decoration: const BoxDecoration(gradient: AppTheme.bgGradient),
+        color: AppTheme.ground,
         child: SafeArea(
           child: Column(
             children: [
@@ -252,27 +252,13 @@ class _ProfilePageState extends State<ProfilePage> {
                         width: double.infinity,
                         padding: const EdgeInsets.all(20),
                         decoration: BoxDecoration(
-                          gradient: const LinearGradient(
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                            colors: [
-                              Color(0xFF143E33),
-                              Color(0xFF0C2720),
-                              Color(0xFF071B15),
-                            ],
-                          ),
+                          color: AppTheme.panel,
                           borderRadius: BorderRadius.circular(22),
                           border: Border.all(
                             color: AppTheme.emeraldGreen.withValues(alpha: 0.4),
                             width: 1.2,
                           ),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.3),
-                              blurRadius: 14,
-                              offset: const Offset(0, 4),
-                            ),
-                          ],
+
                         ),
                         child: Column(
                           children: [
@@ -283,25 +269,13 @@ class _ProfilePageState extends State<ProfilePage> {
                                   width: 86,
                                   height: 86,
                                   decoration: BoxDecoration(
-                                    gradient: const LinearGradient(
-                                      begin: Alignment.topLeft,
-                                      end: Alignment.bottomRight,
-                                      colors: [
-                                        Color(0xFF1F6652),
-                                        Color(0xFF0E3327),
-                                      ],
-                                    ),
+                                    color: AppTheme.panelElevated,
                                     borderRadius: BorderRadius.circular(24),
                                     border: Border.all(
                                       color: AppTheme.neonLime.withValues(alpha: 0.7),
                                       width: 2,
                                     ),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: AppTheme.neonLime.withValues(alpha: 0.15),
-                                        blurRadius: 12,
-                                      ),
-                                    ],
+
                                   ),
                                   clipBehavior: Clip.antiAlias,
                                   child: user?.fotoPath != null &&
@@ -330,15 +304,10 @@ class _ProfilePageState extends State<ProfilePage> {
                                     onTap: _showImagePickerSheet,
                                     child: Container(
                                       padding: const EdgeInsets.all(7),
-                                      decoration: BoxDecoration(
+                                      decoration: const BoxDecoration(
                                         color: AppTheme.neonLime,
                                         shape: BoxShape.circle,
-                                        boxShadow: [
-                                          BoxShadow(
-                                            color: Colors.black.withValues(alpha: 0.4),
-                                            blurRadius: 6,
-                                          ),
-                                        ],
+
                                       ),
                                       child: const Icon(
                                         Icons.camera_alt_rounded,

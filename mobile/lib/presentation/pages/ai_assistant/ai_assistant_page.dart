@@ -148,7 +148,7 @@ class _AiAssistantPageState extends State<AiAssistantPage> {
       body: Container(
         width: double.infinity,
         height: double.infinity,
-        decoration: const BoxDecoration(gradient: AppTheme.bgGradient),
+        color: AppTheme.ground,
         child: SafeArea(
           child: Column(
             children: [
@@ -219,13 +219,7 @@ class _AiAssistantPageState extends State<AiAssistantPage> {
                                   width: 1.1,
                                 )
                               : null,
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.25),
-                              blurRadius: 8,
-                              offset: const Offset(0, 3),
-                            ),
-                          ],
+
                         ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,

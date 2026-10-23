@@ -619,7 +619,7 @@ class _GreenhouseMapPageState extends State<GreenhouseMapPage> {
       body: Container(
         width: double.infinity,
         height: double.infinity,
-        decoration: const BoxDecoration(gradient: AppTheme.bgGradient),
+        color: AppTheme.ground,
         child: SafeArea(
           child: Column(
             children: [
@@ -812,12 +812,7 @@ class _GreenhouseMapPageState extends State<GreenhouseMapPage> {
                                         shape: BoxShape.circle,
                                         color: const Color(0xFF1E88E5),
                                         border: Border.all(color: Colors.white, width: 2.5),
-                                        boxShadow: [
-                                          BoxShadow(
-                                            color: Colors.black.withValues(alpha: 0.35),
-                                            blurRadius: 4,
-                                          ),
-                                        ],
+
                                       ),
                                     ),
                                   ],
@@ -905,12 +900,7 @@ class _GreenhouseMapPageState extends State<GreenhouseMapPage> {
                               color: AppTheme.neonLime.withValues(alpha: 0.5),
                               width: 1.2,
                             ),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withValues(alpha: 0.35),
-                                blurRadius: 10,
-                              ),
-                            ],
+
                           ),
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
@@ -1014,27 +1004,13 @@ class _GreenhouseMapPageState extends State<GreenhouseMapPage> {
                       child: Container(
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
-                          gradient: const LinearGradient(
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                            colors: [
-                              Color(0xFF143E33),
-                              Color(0xFF0C2720),
-                              Color(0xFF071B15),
-                            ],
-                          ),
+                          color: AppTheme.panel,
                           borderRadius: BorderRadius.circular(20),
                           border: Border.all(
                             color: AppTheme.emeraldGreen.withValues(alpha: 0.5),
                             width: 1.2,
                           ),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.4),
-                              blurRadius: 16,
-                              offset: const Offset(0, 6),
-                            ),
-                          ],
+
                         ),
                         child: Column(
                           mainAxisSize: MainAxisSize.min,

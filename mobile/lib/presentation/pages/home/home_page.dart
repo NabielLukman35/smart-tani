@@ -18,126 +18,63 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final user = context.watch<AuthProvider>().currentUser;
-    final screenWidth = MediaQuery.of(context).size.width;
 
     return Scaffold(
-      body: Container(
-        width: double.infinity,
-        height: double.infinity,
-        decoration: const BoxDecoration(gradient: AppTheme.bgGradient),
-        child: SafeArea(
-          child: SingleChildScrollView(
-            physics: const BouncingScrollPhysics(),
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // ── 1. Top Header (Greeting + Brand Squircle Badge) ──
-                _buildHeader(context, user?.nama ?? 'Petani Unggul'),
-                const SizedBox(height: 20),
+      backgroundColor: AppTheme.ground,
+      body: SafeArea(
+        child: SingleChildScrollView(
+          physics: const BouncingScrollPhysics(),
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // ── 1. Header (Brand & Operator Aktif) ──
+              _buildHeader(context, user?.nama ?? 'Petani Unggul'),
+              const SizedBox(height: 24),
 
-                // ── 2. Quick Status Hero Card (Greenhouse Summary) ──
-                _buildStatusBanner(context),
-                const SizedBox(height: 24),
+              // ── 2. Telemetri Lingkungan Mikro (Live Console) ──
+              _buildLiveTelemetry(context),
+              const SizedBox(height: 28),
 
-                // ── 3. Kategori 1: Pertanian (4 Fitur) ──
-                _buildCategorySection(
-                  context: context,
-                  title: 'Pertanian & Budidaya',
-                  subtitle: 'Manajemen lahan, varietas, dan jadwal panen',
-                  icon: Icons.eco_rounded,
-                  accentColor: AppTheme.neonLime,
-                  screenWidth: screenWidth,
-                  items: const [
-                    _MenuItemData(
-                      icon: Icons.map_rounded,
-                      label: 'Greenhouse\nMap',
-                      color: Color(0xFF2ECC71),
-                      page: GreenhouseMapPage(),
-                    ),
-                    _MenuItemData(
-                      icon: Icons.calendar_month_rounded,
-                      label: 'Jadwal\nTanam',
-                      color: Color(0xFF3CD070),
-                      page: JadwalTanamPage(),
-                    ),
-                    _MenuItemData(
-                      icon: Icons.grass_rounded,
-                      label: 'Varietas\nTanaman',
-                      color: Color(0xFF1ABC9C),
-                      page: VarietasTanamanPage(),
-                    ),
-                    _MenuItemData(
-                      icon: Icons.search_rounded,
-                      label: 'Pencarian\nTanaman',
-                      color: Color(0xFF16A085),
-                      page: PencarianPage(),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 22),
+              // ── 3. Operasi & Kontrol Lahan ──
+              const Text(
+                'Operasi & Kontrol Lahan',
+                style: AppTheme.sectionTitle,
+              ),
+              const SizedBox(height: 6),
+              const Text(
+                'Alat presisi pemantauan lapangan, kalender perawatan, dan aktuator.',
+                style: AppTheme.bodyMuted,
+              ),
+              const SizedBox(height: 14),
+              _buildOperationsSection(context),
+              const SizedBox(height: 28),
 
-                // ── 4. Kategori 2: Monitoring & IoT (2 Fitur) ──
-                _buildCategorySection(
-                  context: context,
-                  title: 'Monitoring & IoT',
-                  subtitle: 'Sensor presisi dan konsultasi AI otomatis',
-                  icon: Icons.sensors_rounded,
-                  accentColor: const Color(0xFF00E5FF),
-                  screenWidth: screenWidth,
-                  items: const [
-                    _MenuItemData(
-                      icon: Icons.thermostat_rounded,
-                      label: 'IoT\nMonitor',
-                      color: Color(0xFFFFA726),
-                      page: IoTMonitorPage(),
-                    ),
-                    _MenuItemData(
-                      icon: Icons.smart_toy_rounded,
-                      label: 'AI\nAssistant',
-                      color: Color(0xFF29B6F6),
-                      page: AiAssistantPage(),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 22),
-
-                // ── 5. Kategori 3: Komunitas & Edukasi (2 Fitur) ──
-                _buildCategorySection(
-                  context: context,
-                  title: 'Komunitas & Edukasi',
-                  subtitle: 'Traceability panen dan gamifikasi edukatif',
-                  icon: Icons.groups_rounded,
-                  accentColor: const Color(0xFFB388FF),
-                  screenWidth: screenWidth,
-                  items: const [
-                    _MenuItemData(
-                      icon: Icons.link_rounded,
-                      label: 'Blockchain\nSupply',
-                      color: Color(0xFFAB47BC),
-                      page: BlockchainPage(),
-                    ),
-                    _MenuItemData(
-                      icon: Icons.sports_esports_rounded,
-                      label: 'Edukasi\nGame',
-                      color: Color(0xFFFF5252),
-                      page: EdukasiGamePage(),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 32),
-              ],
-            ),
+              // ── 4. Katalog & Ketertelusuran ──
+              const Text(
+                'Katalog & Ketertelusuran',
+                style: AppTheme.sectionTitle,
+              ),
+              const SizedBox(height: 6),
+              const Text(
+                'Basis data agronomi, log panen terverifikasi, dan modul edukasi.',
+                style: AppTheme.bodyMuted,
+              ),
+              const SizedBox(height: 14),
+              _buildRecordsSection(context),
+              const SizedBox(height: 24),
+            ],
           ),
         ),
       ),
     );
   }
 
-  // ── Header Widget ──
+  // ── Header Lahan ──
   Widget _buildHeader(BuildContext context, String name) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Expanded(
           child: Column(
@@ -146,78 +83,51 @@ class HomePage extends StatelessWidget {
               Row(
                 children: [
                   Container(
-                    width: 8,
-                    height: 8,
+                    width: 7,
+                    height: 7,
                     decoration: const BoxDecoration(
-                      color: AppTheme.neonLime,
+                      color: AppTheme.accent,
                       shape: BoxShape.circle,
                     ),
                   ),
                   const SizedBox(width: 8),
-                  Text(
-                    'Selamat datang,',
-                    style: TextStyle(
-                      color: AppTheme.pastelLime.withValues(alpha: 0.85),
-                      fontSize: 13,
-                      fontWeight: FontWeight.w500,
-                    ),
+                  const Text(
+                    'TaniGreen Agronomy Console',
+                    style: AppTheme.caption,
                   ),
                 ],
               ),
               const SizedBox(height: 4),
               Text(
                 name,
-                style: const TextStyle(
-                  color: AppTheme.creamWhite,
-                  fontSize: 24,
-                  fontWeight: FontWeight.w800,
-                  letterSpacing: -0.5,
-                ),
+                style: AppTheme.headline.copyWith(fontSize: 22),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
             ],
           ),
         ),
-        const SizedBox(width: 12),
-        // Logo Brand Squircle Badge dari Desain Resmi
+        const SizedBox(width: 14),
         const SmartTaniLogo(
-          size: 34,
-          variant: SmartTaniLogoVariant.neonLime,
+          size: 32,
           showBadge: true,
-          hasGlow: true,
         ),
       ],
     );
   }
 
-  // ── Status Banner (Hero Card) ──
-  Widget _buildStatusBanner(BuildContext context) {
+  // ── Telemetri Lahan Real-Time ──
+  Widget _buildLiveTelemetry(BuildContext context) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            Color(0xFF143E33),
-            Color(0xFF0D2B23),
-            Color(0xFF071B15),
-          ],
-        ),
-        borderRadius: BorderRadius.circular(22),
+        color: AppTheme.panel,
+        borderRadius: BorderRadius.circular(14),
         border: Border.all(
-          color: AppTheme.emeraldGreen.withValues(alpha: 0.4),
-          width: 1.2,
+          color: AppTheme.borderQuiet,
+          width: 1,
         ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.35),
-            blurRadius: 14,
-            offset: const Offset(0, 6),
-          ),
-        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -225,82 +135,88 @@ class HomePage extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(6),
-                    decoration: BoxDecoration(
-                      color: AppTheme.neonLime.withValues(alpha: 0.2),
-                      borderRadius: BorderRadius.circular(8),
+              const Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Greenhouse Utama',
+                      style: TextStyle(
+                        color: AppTheme.ink,
+                        fontSize: 15,
+                        fontWeight: FontWeight.w700,
+                      ),
                     ),
-                    child: const Icon(
-                      Icons.spa_rounded,
-                      color: AppTheme.neonLime,
-                      size: 16,
+                    SizedBox(height: 2),
+                    Text(
+                      'Blok Melon Inthanon • Fase Pembesaran',
+                      style: AppTheme.caption,
                     ),
-                  ),
-                  const SizedBox(width: 8),
-                  const Text(
-                    'Sistem Greenhouse Aktif',
-                    style: TextStyle(
-                      color: AppTheme.creamWhite,
-                      fontWeight: FontWeight.w700,
-                      fontSize: 13,
-                    ),
-                  ),
-                ],
+                  ],
+                ),
               ),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
                 decoration: BoxDecoration(
-                  color: AppTheme.neonLime.withValues(alpha: 0.15),
-                  borderRadius: BorderRadius.circular(20),
+                  color: AppTheme.panelElevated,
+                  borderRadius: BorderRadius.circular(6),
                   border: Border.all(
-                    color: AppTheme.neonLime.withValues(alpha: 0.4),
+                    color: AppTheme.borderQuiet,
+                    width: 1,
                   ),
                 ),
-                child: const Text(
-                  '● Kondisi Optimal',
-                  style: TextStyle(
-                    color: AppTheme.neonLime,
-                    fontSize: 11,
-                    fontWeight: FontWeight.w600,
-                  ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      width: 6,
+                      height: 6,
+                      decoration: const BoxDecoration(
+                        color: AppTheme.statusOk,
+                        shape: BoxShape.circle,
+                      ),
+                    ),
+                    const SizedBox(width: 6),
+                    const Text(
+                      'Optimal',
+                      style: TextStyle(
+                        color: AppTheme.statusOk,
+                        fontSize: 11.5,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 14),
+          const SizedBox(height: 18),
+
+          // 3 Kolom Metrik Sensor Lahan
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              _buildSensorMetric(
-                icon: Icons.thermostat_rounded,
-                label: 'Suhu Udara',
-                value: '26.8°C',
-                color: const Color(0xFFFFA726),
+              Expanded(
+                child: _buildMetricBlock(
+                  label: 'Suhu Udara',
+                  value: '26.8°C',
+                  subtext: 'Batas 24-28°C',
+                ),
               ),
-              Container(
-                width: 1,
-                height: 32,
-                color: AppTheme.emeraldGreen.withValues(alpha: 0.3),
+              const SizedBox(width: 8),
+              Expanded(
+                child: _buildMetricBlock(
+                  label: 'Kelembapan',
+                  value: '76%',
+                  subtext: 'Batas 70-80%',
+                ),
               ),
-              _buildSensorMetric(
-                icon: Icons.water_drop_rounded,
-                label: 'Kelembapan',
-                value: '76%',
-                color: const Color(0xFF29B6F6),
-              ),
-              Container(
-                width: 1,
-                height: 32,
-                color: AppTheme.emeraldGreen.withValues(alpha: 0.3),
-              ),
-              _buildSensorMetric(
-                icon: Icons.science_rounded,
-                label: 'pH Tanah',
-                value: '6.4 pH',
-                color: AppTheme.neonLime,
+              const SizedBox(width: 8),
+              Expanded(
+                child: _buildMetricBlock(
+                  label: 'pH Nutrisi',
+                  value: '6.4 pH',
+                  subtext: 'Ideal 6.0-6.8',
+                ),
               ),
             ],
           ),
@@ -309,179 +225,272 @@ class HomePage extends StatelessWidget {
     );
   }
 
-  Widget _buildSensorMetric({
-    required IconData icon,
+  Widget _buildMetricBlock({
     required String label,
     required String value,
-    required Color color,
+    required String subtext,
   }) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
+      decoration: BoxDecoration(
+        color: AppTheme.panelElevated,
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(
+          color: AppTheme.borderQuiet,
+          width: 1,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            label,
+            style: AppTheme.caption,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+          const SizedBox(height: 6),
+          Text(
+            value,
+            style: const TextStyle(
+              color: AppTheme.ink,
+              fontSize: 16,
+              fontWeight: FontWeight.w700,
+              letterSpacing: -0.3,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            subtext,
+            style: const TextStyle(
+              color: AppTheme.inkTertiary,
+              fontSize: 10.5,
+            ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ── Modul Operasi Presisi ──
+  Widget _buildOperationsSection(BuildContext context) {
     return Column(
       children: [
-        Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(icon, color: color, size: 14),
-            const SizedBox(width: 4),
-            Text(
-              value,
-              style: const TextStyle(
-                color: AppTheme.creamWhite,
-                fontWeight: FontWeight.w800,
-                fontSize: 14,
-              ),
-            ),
-          ],
+        _buildActionTile(
+          context: context,
+          icon: Icons.explore_outlined,
+          title: 'Pemetaan Greenhouse & Kompas',
+          description: 'Streaming live GPS lahan dan orientasi kompas hardware ke unit greenhouse.',
+          badgeText: 'GPS & Sensor',
+          onTap: () => Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => const GreenhouseMapPage()),
+          ),
         ),
-        const SizedBox(height: 2),
-        Text(
-          label,
-          style: const TextStyle(
-            color: AppTheme.textGrey,
-            fontSize: 10.5,
+        const SizedBox(height: 10),
+        _buildActionTile(
+          context: context,
+          icon: Icons.event_note_outlined,
+          title: 'Jadwal Perawatan & Notifikasi',
+          description: 'Pengingat otomatis pemupukan NPK, irigasi, dan kalender rotasi panen.',
+          badgeText: 'Pengingat Lokal',
+          onTap: () => Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => const JadwalTanamPage()),
+          ),
+        ),
+        const SizedBox(height: 10),
+        _buildActionTile(
+          context: context,
+          icon: Icons.sensors_outlined,
+          title: 'Telemetri & Aktuator IoT',
+          description: 'Status instrumen aktuator, pompa irigasi otomatis, dan mist blower.',
+          badgeText: 'Aktuator',
+          onTap: () => Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => const IoTMonitorPage()),
+          ),
+        ),
+        const SizedBox(height: 10),
+        _buildActionTile(
+          context: context,
+          icon: Icons.psychology_outlined,
+          title: 'Asisten Agronomi & Suara',
+          description: 'Konsultasi diagnosis hama, daun menguning, dan nutrisi via AI & suara.',
+          badgeText: 'Gemini AI',
+          onTap: () => Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => const AiAssistantPage()),
           ),
         ),
       ],
     );
   }
 
-  // ── Category Section ──
-  Widget _buildCategorySection({
-    required BuildContext context,
-    required String title,
-    required String subtitle,
-    required IconData icon,
-    required Color accentColor,
-    required double screenWidth,
-    required List<_MenuItemData> items,
-  }) {
+  // ── Modul Katalog & Ketertelusuran ──
+  Widget _buildRecordsSection(BuildContext context) {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Category Header dengan Badge Kapsul
         Row(
           children: [
-            Container(
-              padding: const EdgeInsets.all(6),
-              decoration: BoxDecoration(
-                color: accentColor.withValues(alpha: 0.15),
-                borderRadius: BorderRadius.circular(8),
+            Expanded(
+              child: _buildCompactCard(
+                context: context,
+                icon: Icons.spa_outlined,
+                title: 'Varietas Tanaman',
+                subtitle: 'Katalog bibit & siklus tanam',
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const VarietasTanamanPage()),
+                ),
               ),
-              child: Icon(icon, color: accentColor, size: 16),
             ),
             const SizedBox(width: 10),
             Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: const TextStyle(
-                      color: AppTheme.creamWhite,
-                      fontSize: 14.5,
-                      fontWeight: FontWeight.w800,
-                      letterSpacing: 0.3,
-                    ),
-                  ),
-                  Text(
-                    subtitle,
-                    style: TextStyle(
-                      color: AppTheme.textGrey.withValues(alpha: 0.8),
-                      fontSize: 11,
-                    ),
-                  ),
-                ],
+              child: _buildCompactCard(
+                context: context,
+                icon: Icons.search_outlined,
+                title: 'Pencarian Tanaman',
+                subtitle: 'Filter agronomis & hama',
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const PencarianPage()),
+                ),
               ),
             ),
           ],
         ),
-        const SizedBox(height: 14),
-
-        // Grid Menu Items (4 Kolom Sesuai Referensi Squircle BCA & Desain)
-        Wrap(
-          spacing: 12,
-          runSpacing: 14,
-          children: items.map((item) {
-            final itemWidth = (screenWidth - 40 - 36) / 4;
-            return _buildMenuItem(
-              context: context,
-              item: item,
-              width: itemWidth,
-            );
-          }).toList(),
+        const SizedBox(height: 10),
+        Row(
+          children: [
+            Expanded(
+              child: _buildCompactCard(
+                context: context,
+                icon: Icons.verified_outlined,
+                title: 'Buku Rantai Pasok',
+                subtitle: 'Verifikasi SHA-256 panen',
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const BlockchainPage()),
+                ),
+              ),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: _buildCompactCard(
+                context: context,
+                icon: Icons.sports_esports_outlined,
+                title: 'Simulasi Edukasi',
+                subtitle: 'Gamifikasi panen & kuis',
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const EdukasiGamePage()),
+                ),
+              ),
+            ),
+          ],
         ),
       ],
     );
   }
 
-  // ── Single Menu Item (Squircle Card Mewah) ──
-  Widget _buildMenuItem({
+  Widget _buildActionTile({
     required BuildContext context,
-    required _MenuItemData item,
-    required double width,
+    required IconData icon,
+    required String title,
+    required String description,
+    required String badgeText,
+    required VoidCallback onTap,
   }) {
-    return GestureDetector(
-      onTap: () {
-        Navigator.of(context).push(
-          MaterialPageRoute(builder: (_) => item.page),
-        );
-      },
-      behavior: HitTestBehavior.opaque,
-      child: SizedBox(
-        width: width,
-        child: Column(
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: AppTheme.panel,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: AppTheme.borderQuiet,
+            width: 1,
+          ),
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Squircle Button Card
             Container(
-              width: width * 0.86,
-              height: width * 0.86,
+              padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    Color(0xFF163E33),
-                    Color(0xFF0C2720),
-                    Color(0xFF071B15),
-                  ],
-                ),
-                borderRadius: BorderRadius.circular(20),
+                color: AppTheme.panelElevated,
+                borderRadius: BorderRadius.circular(10),
                 border: Border.all(
-                  color: item.color.withValues(alpha: 0.45),
-                  width: 1.2,
+                  color: AppTheme.borderQuiet,
+                  width: 1,
                 ),
-                boxShadow: [
-                  BoxShadow(
-                    color: item.color.withValues(alpha: 0.16),
-                    blurRadius: 10,
-                    offset: const Offset(0, 3),
+              ),
+              child: Icon(
+                icon,
+                color: AppTheme.accent,
+                size: 20,
+              ),
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          title,
+                          style: const TextStyle(
+                            color: AppTheme.ink,
+                            fontSize: 14.5,
+                            fontWeight: FontWeight.w700,
+                            letterSpacing: -0.2,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: AppTheme.panelElevated,
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: Text(
+                          badgeText,
+                          style: const TextStyle(
+                            color: AppTheme.inkSecondary,
+                            fontSize: 10,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.35),
-                    blurRadius: 6,
-                    offset: const Offset(0, 2),
+                  const SizedBox(height: 4),
+                  Text(
+                    description,
+                    style: AppTheme.bodyMuted.copyWith(fontSize: 12),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ],
               ),
-              child: Center(
-                child: Icon(
-                  item.icon,
-                  color: item.color,
-                  size: 28,
-                ),
-              ),
             ),
-            const SizedBox(height: 8),
-            // Label Teks
-            Text(
-              item.label,
-              textAlign: TextAlign.center,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
-                color: AppTheme.creamWhite,
-                fontSize: 10.8,
-                fontWeight: FontWeight.w600,
-                height: 1.2,
+            const SizedBox(width: 8),
+            const Padding(
+              padding: EdgeInsets.only(top: 8),
+              child: Icon(
+                Icons.chevron_right_rounded,
+                color: AppTheme.inkTertiary,
+                size: 18,
               ),
             ),
           ],
@@ -489,19 +498,67 @@ class HomePage extends StatelessWidget {
       ),
     );
   }
-}
 
-// ── Data class for menu items ──
-class _MenuItemData {
-  final IconData icon;
-  final String label;
-  final Color color;
-  final Widget page;
-
-  const _MenuItemData({
-    required this.icon,
-    required this.label,
-    required this.color,
-    required this.page,
-  });
+  Widget _buildCompactCard({
+    required BuildContext context,
+    required IconData icon,
+    required String title,
+    required String subtitle,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          color: AppTheme.panel,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: AppTheme.borderQuiet,
+            width: 1,
+          ),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: AppTheme.panelElevated,
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(
+                  color: AppTheme.borderQuiet,
+                  width: 1,
+                ),
+              ),
+              child: Icon(
+                icon,
+                color: AppTheme.ink,
+                size: 18,
+              ),
+            ),
+            const SizedBox(height: 12),
+            Text(
+              title,
+              style: const TextStyle(
+                color: AppTheme.ink,
+                fontSize: 13.5,
+                fontWeight: FontWeight.w700,
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+            const SizedBox(height: 2),
+            Text(
+              subtitle,
+              style: AppTheme.caption,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }

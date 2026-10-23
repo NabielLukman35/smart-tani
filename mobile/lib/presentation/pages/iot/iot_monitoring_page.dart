@@ -239,7 +239,7 @@ class _IotMonitoringPageState extends State<IotMonitoringPage> {
       body: Container(
         width: double.infinity,
         height: double.infinity,
-        decoration: const BoxDecoration(gradient: AppTheme.bgGradient),
+        color: AppTheme.ground,
         child: SafeArea(
           child: Column(
             children: [
@@ -274,9 +274,7 @@ class _IotMonitoringPageState extends State<IotMonitoringPage> {
                     Container(
                       padding: const EdgeInsets.all(18),
                       decoration: BoxDecoration(
-                        gradient: const LinearGradient(
-                          colors: [Color(0xFF143E33), Color(0xFF0C2720)],
-                        ),
+                        color: AppTheme.panel,
                         borderRadius: BorderRadius.circular(20),
                         border: Border.all(
                           color: AppTheme.emeraldGreen.withValues(alpha: 0.4),

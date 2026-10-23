@@ -23,65 +23,41 @@ class _MainLayoutState extends State<MainLayout> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppTheme.ground,
       body: IndexedStack(
         index: _currentIndex,
         children: _pages,
       ),
       bottomNavigationBar: Container(
-        decoration: BoxDecoration(
-          color: AppTheme.darkForest,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.4),
-              blurRadius: 20,
-              offset: const Offset(0, -4),
+        decoration: const BoxDecoration(
+          color: AppTheme.panel,
+          border: Border(
+            top: BorderSide(
+              color: AppTheme.borderQuiet,
+              width: 1,
             ),
-          ],
+          ),
         ),
         child: SafeArea(
           top: false,
-          child: Container(
-            margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-            decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  Color(0xFF143B31),
-                  Color(0xFF0C2720),
-                  Color(0xFF071C15),
-                ],
-              ),
-              borderRadius: BorderRadius.circular(24),
-              border: Border.all(
-                color: AppTheme.emeraldGreen.withValues(alpha: 0.45),
-                width: 1.2,
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: AppTheme.neonLime.withValues(alpha: 0.08),
-                  blurRadius: 16,
-                  offset: const Offset(0, 4),
-                ),
-              ],
-            ),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
                 _buildNavItem(
                   index: 0,
-                  icon: Icons.home_rounded,
-                  label: 'Beranda',
+                  icon: Icons.grid_view_rounded,
+                  label: 'Lahan',
                 ),
                 _buildNavItem(
                   index: 1,
-                  icon: Icons.person_rounded,
+                  icon: Icons.person_outline_rounded,
                   label: 'Profil',
                 ),
                 _buildNavItem(
                   index: 2,
-                  icon: Icons.feedback_rounded,
+                  icon: Icons.chat_bubble_outline_rounded,
                   label: 'Saran & Kesan',
                 ),
               ],
@@ -107,41 +83,34 @@ class _MainLayoutState extends State<MainLayout> {
       },
       behavior: HitTestBehavior.opaque,
       child: AnimatedContainer(
-        duration: const Duration(milliseconds: 240),
-        curve: Curves.easeOutCubic,
-        padding: EdgeInsets.symmetric(
-          horizontal: isSelected ? 18 : 12,
-          vertical: 8,
-        ),
+        duration: const Duration(milliseconds: 180),
+        curve: Curves.easeOut,
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
-          color: isSelected
-              ? AppTheme.neonLime.withValues(alpha: 0.18)
-              : Colors.transparent,
-          borderRadius: BorderRadius.circular(16),
-          border: isSelected
-              ? Border.all(
-                  color: AppTheme.neonLime.withValues(alpha: 0.6),
-                  width: 1,
-                )
-              : null,
+          color: isSelected ? AppTheme.panelElevated : Colors.transparent,
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(
+            color: isSelected ? AppTheme.borderQuiet : Colors.transparent,
+            width: 1,
+          ),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
             Icon(
               icon,
-              size: isSelected ? 22 : 20,
-              color: isSelected ? AppTheme.neonLime : AppTheme.textGrey,
+              size: 20,
+              color: isSelected ? AppTheme.accent : AppTheme.inkSecondary,
             ),
             if (isSelected) ...[
               const SizedBox(width: 8),
               Text(
                 label,
                 style: const TextStyle(
-                  color: AppTheme.neonLime,
-                  fontWeight: FontWeight.w700,
-                  fontSize: 12.5,
-                  letterSpacing: 0.2,
+                  color: AppTheme.ink,
+                  fontWeight: FontWeight.w600,
+                  fontSize: 13,
+                  letterSpacing: -0.2,
                 ),
               ),
             ],

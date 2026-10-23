@@ -151,7 +151,7 @@ class _VarietasTanamanPageState extends State<VarietasTanamanPage> {
       body: Container(
         width: double.infinity,
         height: double.infinity,
-        decoration: const BoxDecoration(gradient: AppTheme.bgGradient),
+        color: AppTheme.ground,
         child: SafeArea(
           child: Column(
             children: [
@@ -216,27 +216,13 @@ class _VarietasTanamanPageState extends State<VarietasTanamanPage> {
                                 margin: const EdgeInsets.only(bottom: 16),
                                 padding: const EdgeInsets.all(18),
                                 decoration: BoxDecoration(
-                                  gradient: const LinearGradient(
-                                    begin: Alignment.topLeft,
-                                    end: Alignment.bottomRight,
-                                    colors: [
-                                      Color(0xFF143E33),
-                                      Color(0xFF0C2720),
-                                      Color(0xFF071B15),
-                                    ],
-                                  ),
+                                  color: AppTheme.panel,
                                   borderRadius: BorderRadius.circular(20),
                                   border: Border.all(
                                     color: color.withValues(alpha: 0.4),
                                     width: 1.2,
                                   ),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.black.withValues(alpha: 0.3),
-                                      blurRadius: 10,
-                                      offset: const Offset(0, 4),
-                                    ),
-                                  ],
+
                                 ),
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,

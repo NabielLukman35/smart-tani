@@ -91,7 +91,7 @@ class _SaranKesanPageState extends State<SaranKesanPage> {
       body: Container(
         width: double.infinity,
         height: double.infinity,
-        decoration: const BoxDecoration(gradient: AppTheme.bgGradient),
+        color: AppTheme.ground,
         child: SafeArea(
           child: Column(
             children: [
@@ -145,27 +145,13 @@ class _SaranKesanPageState extends State<SaranKesanPage> {
                         width: double.infinity,
                         padding: const EdgeInsets.all(20),
                         decoration: BoxDecoration(
-                          gradient: const LinearGradient(
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                            colors: [
-                              Color(0xFF143E33),
-                              Color(0xFF0C2720),
-                              Color(0xFF071B15),
-                            ],
-                          ),
+                          color: AppTheme.panel,
                           borderRadius: BorderRadius.circular(22),
                           border: Border.all(
                             color: AppTheme.emeraldGreen.withValues(alpha: 0.4),
                             width: 1.2,
                           ),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.3),
-                              blurRadius: 14,
-                              offset: const Offset(0, 4),
-                            ),
-                          ],
+
                         ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,

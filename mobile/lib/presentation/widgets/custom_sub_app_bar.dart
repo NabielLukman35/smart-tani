@@ -18,57 +18,42 @@ class CustomSubAppBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      decoration: BoxDecoration(
-        color: AppTheme.darkForest.withValues(alpha: 0.85),
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+      decoration: const BoxDecoration(
+        color: AppTheme.ground,
         border: Border(
           bottom: BorderSide(
-            color: AppTheme.emeraldGreen.withValues(alpha: 0.25),
+            color: AppTheme.borderQuiet,
             width: 1,
           ),
         ),
       ),
       child: Row(
         children: [
-          // ── Tombol Back Berbentuk Squircle Cantik ──
+          // Flat Back Button
           GestureDetector(
             onTap: onBackPressed ?? () => Navigator.of(context).pop(),
             child: Container(
-              width: 40,
-              height: 40,
+              width: 38,
+              height: 38,
               decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    Color(0xFF163E33),
-                    Color(0xFF0C2720),
-                    Color(0xFF071B15),
-                  ],
-                ),
-                borderRadius: BorderRadius.circular(12),
+                color: AppTheme.panel,
+                borderRadius: BorderRadius.circular(10),
                 border: Border.all(
-                  color: AppTheme.emeraldGreen.withValues(alpha: 0.4),
+                  color: AppTheme.borderQuiet,
                   width: 1,
                 ),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.25),
-                    blurRadius: 4,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
               ),
               child: const Icon(
                 Icons.arrow_back_rounded,
-                color: AppTheme.neonLime,
-                size: 20,
+                color: AppTheme.ink,
+                size: 19,
               ),
             ),
           ),
           const SizedBox(width: 14),
 
-          // ── Title & Subtitle ──
+          // Title & Subtitle (Left aligned, max 2 lines, clean hierarchy)
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -76,22 +61,20 @@ class CustomSubAppBar extends StatelessWidget {
               children: [
                 Text(
                   title,
-                  style: const TextStyle(
-                    color: AppTheme.creamWhite,
+                  style: AppTheme.headline.copyWith(
                     fontSize: 17,
-                    fontWeight: FontWeight.w800,
-                    letterSpacing: -0.3,
+                    letterSpacing: -0.2,
                   ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
                 if (subtitle != null) ...[
-                  const SizedBox(height: 1),
+                  const SizedBox(height: 2),
                   Text(
                     subtitle!,
-                    style: TextStyle(
-                      color: AppTheme.pastelLime.withValues(alpha: 0.75),
-                      fontSize: 11,
+                    style: AppTheme.caption.copyWith(
+                      color: AppTheme.inkSecondary,
+                      fontSize: 12,
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,

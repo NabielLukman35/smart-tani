@@ -1,104 +1,208 @@
 import 'package:flutter/material.dart';
 
+/// Design Taste: Smart Greenhouse & Agronomy Instrumentation
+/// Rules:
+/// - One ground, one ink, one accent
+/// - Flat color and real material over gradients
+/// - No gradients as background, text, or buttons
+/// - No shadows on static elements
+/// - Surfaces separated by tone differences, not thin lines or glows
+/// - Left alignment by default
+/// - Headlines 2 lines or fewer at every width
 class AppTheme {
-  // ── Palet Warna Resmi Desain Smart Tani ──
-  // Ekstrak langsung dari kartu palet & spektrum gradasi
-  static const Color neonLime = Color(0xFFE3EF2D);        // Lime primer berpendar
-  static const Color neonLimeBright = Color(0xFFE5FF2E);  // Lime cerah
-  static const Color pastelLime = Color(0xFFE2FBCE);      // Mint lime pastel lembut
-  static const Color creamWhite = Color(0xFFFFFDEE);      // Cream highlight
-  static const Color emeraldGreen = Color(0xFF1F6652);    // Hijau zamrud natural
-  static const Color deepTeal = Color(0xFF1F4A4A);        // Teal slate malam
-  static const Color oceanTeal = Color(0xFF245863);       // Ocean teal sejuk
-  static const Color darkSpruce = Color(0xFF0C241C);      // Spruce gelap elegan
-  static const Color darkForest = Color(0xFF061D10);      // Background dasar gelap pekat
-  static const Color darkGreenTop = Color(0xFF071B15);    // Top level container
-  static const Color darkGreenBottom = Color(0xFF124E3B); // Bottom gradient anchor
-  static const Color cardSurface = Color(0xFF0D2821);     // Permukaan kartu squircle
-  static const Color inputFill = Color(0xFF091E18);       // Fill textfield
-  static const Color textGrey = Color(0xFF8FA99F);        // Teks sekunder
-  static const Color textLight = Color(0xFFFFFDEE);       // Teks primer kontras
+  // ── Palet Tiga Elemen Disiplin (Ground, Ink, Accent) ──
+  static const Color ground = Color(0xFF0A1410);          // Ground dasar (tanah malam pekat)
+  static const Color panel = Color(0xFF122019);           // Surface panel instrumen lahan
+  static const Color panelElevated = Color(0xFF182A22);   // Kontainer elevasi / input field
+  static const Color borderQuiet = Color(0xFF1F352B);     // Batas tenang pemisah tone
 
-  // ── Gradasi Background & Card Resmi ──
-  // Gradasi Background Utama (Malam Kehutanan Mewah)
+  static const Color ink = Color(0xFFF3F7F2);             // Ink primer (kontras, mudah dibaca)
+  static const Color inkSecondary = Color(0xFF8FA396);    // Ink sekunder (sage netral)
+  static const Color inkTertiary = Color(0xFF607569);     // Ink metadata pendukung
+  static const Color accent = Color(0xFFD4E838);          // Aksen agronomi fungsional (lime)
+
+  static const Color statusAlert = Color(0xFFE06C75);     // Peringatan kritis
+  static const Color statusOk = Color(0xFF73C991);        // Status optimal / normal
+  static const Color statusWarning = Color(0xFFE5A93C);   // Perhatian
+
+  // ── Alias Kompatibilitas Kode Eksisting (Flat & Selaras) ──
+  static const Color darkForest = ground;
+  static const Color cardSurface = panel;
+  static const Color darkSpruce = panel;
+  static const Color inputFill = panelElevated;
+  static const Color creamWhite = ink;
+  static const Color textLight = ink;
+  static const Color textGrey = inkSecondary;
+  static const Color pastelLime = inkSecondary;
+  static const Color neonLime = accent;
+  static const Color neonLimeBright = accent;
+  static const Color emeraldGreen = borderQuiet;
+  static const Color deepTeal = panel;
+  static const Color oceanTeal = panelElevated;
+  static const Color darkGreenTop = ground;
+  static const Color darkGreenBottom = ground;
+
+  // ── Gradasi Dinonaktifkan (Flat Solid Color demi Kepatuhan Design Taste) ──
   static const LinearGradient bgGradient = LinearGradient(
     begin: Alignment.topCenter,
     end: Alignment.bottomCenter,
-    colors: [
-      Color(0xFF061D10),
-      Color(0xFF0A261E),
-      Color(0xFF0F3A2E),
-      Color(0xFF124E3B),
-    ],
+    colors: [ground, ground],
   );
 
-  // Gradasi Kartu Squircle (Aksentuasi Mewah seperti Squircle Icon)
   static const LinearGradient squircleGradient = LinearGradient(
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
-    colors: [
-      Color(0xFF163A33),
-      Color(0xFF0C2720),
-      Color(0xFF071B15),
-    ],
+    colors: [panel, panel],
   );
 
-  // Gradasi Tombol Aksi Utama (Vibrant Lime)
   static const LinearGradient limeButtonGradient = LinearGradient(
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
-    colors: [
-      creamWhite,
-      neonLime,
-      Color(0xFFD0ED22),
-    ],
+    colors: [accent, accent],
   );
 
-  // Gradasi Aksen (Pastel Lime ke Emerald)
   static const LinearGradient accentGradient = LinearGradient(
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
-    colors: [
-      pastelLime,
-      neonLime,
-      emeraldGreen,
-    ],
+    colors: [accent, accent],
   );
 
-  // ── ThemeData Gelap yang Konsisten & Nyaman ──
+  // ── Typography Tokens (Left-aligned, Scaled, Clean) ──
+  static const TextStyle display = TextStyle(
+    color: ink,
+    fontSize: 28,
+    fontWeight: FontWeight.w700,
+    letterSpacing: -0.6,
+    height: 1.15,
+  );
+
+  static const TextStyle headline = TextStyle(
+    color: ink,
+    fontSize: 20,
+    fontWeight: FontWeight.w700,
+    letterSpacing: -0.3,
+    height: 1.25,
+  );
+
+  static const TextStyle sectionTitle = TextStyle(
+    color: ink,
+    fontSize: 16,
+    fontWeight: FontWeight.w600,
+    letterSpacing: -0.2,
+    height: 1.3,
+  );
+
+  static const TextStyle body = TextStyle(
+    color: ink,
+    fontSize: 14,
+    fontWeight: FontWeight.w400,
+    height: 1.45,
+  );
+
+  static const TextStyle bodyMuted = TextStyle(
+    color: inkSecondary,
+    fontSize: 13,
+    fontWeight: FontWeight.w400,
+    height: 1.4,
+  );
+
+  static const TextStyle caption = TextStyle(
+    color: inkTertiary,
+    fontSize: 11.5,
+    fontWeight: FontWeight.w500,
+    height: 1.3,
+  );
+
+  // ── ThemeData Flat & Bebas Bayangan Palsu ──
   static ThemeData get darkTheme {
     return ThemeData(
       brightness: Brightness.dark,
-      scaffoldBackgroundColor: darkForest,
-      primaryColor: neonLime,
+      scaffoldBackgroundColor: ground,
+      primaryColor: accent,
       colorScheme: const ColorScheme.dark(
-        primary: neonLime,
-        secondary: emeraldGreen,
-        surface: darkForest,
-        onSurface: creamWhite,
+        primary: accent,
+        secondary: panelElevated,
+        surface: ground,
+        onSurface: ink,
       ),
       fontFamily: 'Roboto',
       appBarTheme: const AppBarTheme(
-        backgroundColor: Colors.transparent,
+        backgroundColor: ground,
         elevation: 0,
-        centerTitle: true,
+        scrolledUnderElevation: 0,
+        centerTitle: false,
         titleTextStyle: TextStyle(
-          color: creamWhite,
+          color: ink,
           fontSize: 18,
           fontWeight: FontWeight.w700,
         ),
-        iconTheme: IconThemeData(color: neonLime),
+        iconTheme: IconThemeData(color: ink),
       ),
       cardTheme: CardThemeData(
-        color: cardSurface,
-        elevation: 4,
+        color: panel,
+        elevation: 0,
+        margin: EdgeInsets.zero,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
-          side: BorderSide(
-            color: emeraldGreen.withValues(alpha: 0.35),
+          borderRadius: BorderRadius.circular(14),
+          side: const BorderSide(
+            color: borderQuiet,
             width: 1,
           ),
         ),
+      ),
+      inputDecorationTheme: InputDecorationTheme(
+        filled: true,
+        fillColor: panelElevated,
+        hintStyle: const TextStyle(color: inkTertiary, fontSize: 13.5),
+        labelStyle: const TextStyle(color: inkSecondary, fontSize: 13.5),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: borderQuiet, width: 1),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: borderQuiet, width: 1),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: accent, width: 1.5),
+        ),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      ),
+      elevatedButtonTheme: ElevatedButtonThemeData(
+        style: ElevatedButton.styleFrom(
+          elevation: 0,
+          backgroundColor: accent,
+          foregroundColor: ground,
+          textStyle: const TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w700,
+            letterSpacing: -0.2,
+          ),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+        ),
+      ),
+      outlinedButtonTheme: OutlinedButtonThemeData(
+        style: OutlinedButton.styleFrom(
+          foregroundColor: ink,
+          side: const BorderSide(color: borderQuiet, width: 1),
+          textStyle: const TextStyle(
+            fontSize: 13.5,
+            fontWeight: FontWeight.w600,
+          ),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        ),
+      ),
+      dividerTheme: const DividerThemeData(
+        color: borderQuiet,
+        thickness: 1,
+        space: 1,
       ),
     );
   }

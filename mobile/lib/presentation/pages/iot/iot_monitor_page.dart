@@ -21,7 +21,7 @@ class _IoTMonitorPageState extends State<IoTMonitorPage> {
       body: Container(
         width: double.infinity,
         height: double.infinity,
-        decoration: const BoxDecoration(gradient: AppTheme.bgGradient),
+        color: AppTheme.ground,
         child: SafeArea(
           child: Column(
             children: [
@@ -71,9 +71,7 @@ class _IoTMonitorPageState extends State<IoTMonitorPage> {
                       Container(
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
-                          gradient: const LinearGradient(
-                            colors: [Color(0xFF163E33), Color(0xFF0C2720)],
-                          ),
+                          color: AppTheme.panel,
                           borderRadius: BorderRadius.circular(18),
                           border: Border.all(
                             color: AppTheme.emeraldGreen.withValues(alpha: 0.45),

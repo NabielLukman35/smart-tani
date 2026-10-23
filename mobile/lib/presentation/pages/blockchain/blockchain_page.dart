@@ -280,7 +280,7 @@ class _BlockchainPageState extends State<BlockchainPage> {
       body: Container(
         width: double.infinity,
         height: double.infinity,
-        decoration: const BoxDecoration(gradient: AppTheme.bgGradient),
+        color: AppTheme.ground,
         child: SafeArea(
           child: Column(
             children: [
@@ -318,15 +318,7 @@ class _BlockchainPageState extends State<BlockchainPage> {
                 child: Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    gradient: const LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: [
-                        Color(0xFF1E382B),
-                        Color(0xFF10281F),
-                        Color(0xFF071B15),
-                      ],
-                    ),
+                    color: AppTheme.panel,
                     borderRadius: BorderRadius.circular(20),
                     border: Border.all(
                       color: AppTheme.emeraldGreen.withValues(alpha: 0.4),

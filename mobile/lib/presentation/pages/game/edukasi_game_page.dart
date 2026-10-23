@@ -328,15 +328,7 @@ class _EdukasiGamePageState extends State<EdukasiGamePage>
             Positioned.fill(
               child: Container(
                 decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [
-                      Color(0xFF04180E),
-                      Color(0xFF0B2E21),
-                      Color(0xFF144533),
-                    ],
-                  ),
+                  color: AppTheme.panel,
                   borderRadius: BorderRadius.circular(20),
                   border: Border.all(
                     color: AppTheme.emeraldGreen.withValues(alpha: 0.4),
@@ -361,18 +353,10 @@ class _EdukasiGamePageState extends State<EdukasiGamePage>
                 width: 90,
                 height: 44,
                 decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    colors: [Color(0xFF2ECC71), Color(0xFF1B6A45)],
-                  ),
+                  color: AppTheme.accent,
                   borderRadius: BorderRadius.circular(16),
                   border: Border.all(color: AppTheme.neonLime, width: 2),
-                  boxShadow: [
-                    BoxShadow(
-                      color: AppTheme.neonLime.withValues(alpha: 0.35),
-                      blurRadius: 10,
-                      spreadRadius: 1,
-                    ),
-                  ],
+
                 ),
                 child: const Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -478,14 +462,9 @@ class _EdukasiGamePageState extends State<EdukasiGamePage>
         return const Text('≡ƒìê', style: TextStyle(fontSize: 32));
       case FallingItemType.melonEmas:
         return Container(
-          decoration: BoxDecoration(
+          decoration: const BoxDecoration(
             shape: BoxShape.circle,
-            boxShadow: [
-              BoxShadow(
-                color: Colors.amber.withValues(alpha: 0.8),
-                blurRadius: 10,
-              ),
-            ],
+
           ),
           child: const Text('≡ƒìê', style: TextStyle(fontSize: 34)),
         );
@@ -504,7 +483,7 @@ class _EdukasiGamePageState extends State<EdukasiGamePage>
       body: Container(
         width: double.infinity,
         height: double.infinity,
-        decoration: const BoxDecoration(gradient: AppTheme.bgGradient),
+        color: AppTheme.ground,
         child: SafeArea(
           child: Column(
             children: [
