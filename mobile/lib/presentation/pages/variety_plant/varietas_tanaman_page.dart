@@ -34,7 +34,7 @@ class _VarietasTanamanPageState extends State<VarietasTanamanPage> {
     final namaCtrl = TextEditingController();
     final deskripsiCtrl = TextEditingController();
     final panduanCtrl = TextEditingController();
-    final umurCtrl = TextEditingController(text: '65');
+    final umurCtrl = TextEditingController();
 
     showModalBottomSheet(
       context: context,
@@ -68,7 +68,8 @@ class _VarietasTanamanPageState extends State<VarietasTanamanPage> {
                     ),
                   ),
                   IconButton(
-                    icon: const Icon(Icons.close_rounded, color: AppTheme.textGrey),
+                    icon: const Icon(Icons.close_rounded,
+                        color: AppTheme.textGrey),
                     onPressed: () => Navigator.pop(ctx),
                   ),
                 ],
@@ -80,7 +81,8 @@ class _VarietasTanamanPageState extends State<VarietasTanamanPage> {
               const SizedBox(height: 10),
               _buildField('Panduan Perawatan (pH, Nutrisi, Hama)', panduanCtrl),
               const SizedBox(height: 10),
-              _buildField('Estimasi Umur Panen (Hari)', umurCtrl, isNumber: true),
+              _buildField('Estimasi Umur Panen (Hari)', umurCtrl,
+                  isNumber: true),
               const SizedBox(height: 18),
               SizedBox(
                 width: double.infinity,
@@ -101,7 +103,8 @@ class _VarietasTanamanPageState extends State<VarietasTanamanPage> {
                     if (mounted) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
-                          content: Text('Varietas berhasil disimpan ke database SQLite!'),
+                          content: Text(
+                              'Varietas berhasil disimpan ke database SQLite!'),
                           backgroundColor: AppTheme.neonLime,
                           behavior: SnackBarBehavior.floating,
                         ),
@@ -111,9 +114,11 @@ class _VarietasTanamanPageState extends State<VarietasTanamanPage> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppTheme.neonLime,
                     foregroundColor: AppTheme.darkForest,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14)),
                   ),
-                  child: const Text('Simpan ke Database Lokal', style: TextStyle(fontWeight: FontWeight.w800)),
+                  child: const Text('Simpan ke Database Lokal',
+                      style: TextStyle(fontWeight: FontWeight.w800)),
                 ),
               ),
             ],
@@ -123,12 +128,14 @@ class _VarietasTanamanPageState extends State<VarietasTanamanPage> {
     );
   }
 
-  Widget _buildField(String hint, TextEditingController ctrl, {bool isNumber = false}) {
+  Widget _buildField(String hint, TextEditingController ctrl,
+      {bool isNumber = false}) {
     return Container(
       decoration: BoxDecoration(
         color: AppTheme.inputFill,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppTheme.emeraldGreen.withValues(alpha: 0.35)),
+        border:
+            Border.all(color: AppTheme.emeraldGreen.withValues(alpha: 0.35)),
       ),
       child: TextField(
         controller: ctrl,
@@ -138,7 +145,8 @@ class _VarietasTanamanPageState extends State<VarietasTanamanPage> {
         decoration: InputDecoration(
           hintText: hint,
           hintStyle: const TextStyle(color: AppTheme.textGrey, fontSize: 12),
-          contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+          contentPadding:
+              const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
           border: InputBorder.none,
         ),
       ),
@@ -161,16 +169,19 @@ class _VarietasTanamanPageState extends State<VarietasTanamanPage> {
                 trailing: GestureDetector(
                   onTap: _showAddVarietasDialog,
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                     decoration: BoxDecoration(
                       color: AppTheme.neonLime.withValues(alpha: 0.18),
                       borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: AppTheme.neonLime.withValues(alpha: 0.6)),
+                      border: Border.all(
+                          color: AppTheme.neonLime.withValues(alpha: 0.6)),
                     ),
                     child: const Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Icon(Icons.add_rounded, color: AppTheme.neonLime, size: 16),
+                        Icon(Icons.add_rounded,
+                            color: AppTheme.neonLime, size: 16),
                         SizedBox(width: 4),
                         Text(
                           'Tambah',
@@ -187,7 +198,9 @@ class _VarietasTanamanPageState extends State<VarietasTanamanPage> {
               ),
               Expanded(
                 child: _isLoading
-                    ? const Center(child: CircularProgressIndicator(color: AppTheme.neonLime))
+                    ? const Center(
+                        child:
+                            CircularProgressIndicator(color: AppTheme.neonLime))
                     : _varieties.isEmpty
                         ? const Center(
                             child: Text(
@@ -201,10 +214,14 @@ class _VarietasTanamanPageState extends State<VarietasTanamanPage> {
                             itemCount: _varieties.length,
                             itemBuilder: (ctx, idx) {
                               final item = _varieties[idx];
-                              final nama = item['nama_varietas']?.toString() ?? 'Varietas Unggul';
-                              final deskripsi = item['deskripsi']?.toString() ?? '-';
-                              final panduan = item['panduan_perawatan']?.toString() ?? '-';
-                              final umur = item['estimasi_umur']?.toString() ?? '60';
+                              final nama = item['nama_varietas']?.toString() ??
+                                  'Varietas Unggul';
+                              final deskripsi =
+                                  item['deskripsi']?.toString() ?? '-';
+                              final panduan =
+                                  item['panduan_perawatan']?.toString() ?? '-';
+                              final umur =
+                                  item['estimasi_umur']?.toString() ?? '60';
 
                               final color = idx % 3 == 0
                                   ? const Color(0xFFFFD54F) // Gold/Melon
@@ -222,26 +239,30 @@ class _VarietasTanamanPageState extends State<VarietasTanamanPage> {
                                     color: color.withValues(alpha: 0.4),
                                     width: 1.2,
                                   ),
-
                                 ),
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Row(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
                                         Container(
                                           padding: const EdgeInsets.all(12),
                                           decoration: BoxDecoration(
-                                            color: color.withValues(alpha: 0.15),
-                                            borderRadius: BorderRadius.circular(14),
+                                            color:
+                                                color.withValues(alpha: 0.15),
+                                            borderRadius:
+                                                BorderRadius.circular(14),
                                           ),
-                                          child: Icon(Icons.grain_rounded, color: color, size: 26),
+                                          child: Icon(Icons.grain_rounded,
+                                              color: color, size: 26),
                                         ),
                                         const SizedBox(width: 14),
                                         Expanded(
                                           child: Column(
-                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
                                             children: [
                                               Text(
                                                 nama,
@@ -263,10 +284,13 @@ class _VarietasTanamanPageState extends State<VarietasTanamanPage> {
                                           ),
                                         ),
                                         Container(
-                                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 8, vertical: 4),
                                           decoration: BoxDecoration(
-                                            color: color.withValues(alpha: 0.15),
-                                            borderRadius: BorderRadius.circular(8),
+                                            color:
+                                                color.withValues(alpha: 0.15),
+                                            borderRadius:
+                                                BorderRadius.circular(8),
                                           ),
                                           child: Text(
                                             'SQLite',
@@ -283,7 +307,8 @@ class _VarietasTanamanPageState extends State<VarietasTanamanPage> {
                                     Text(
                                       deskripsi,
                                       style: TextStyle(
-                                        color: AppTheme.pastelLime.withValues(alpha: 0.9),
+                                        color: AppTheme.pastelLime
+                                            .withValues(alpha: 0.9),
                                         fontSize: 12,
                                         height: 1.35,
                                       ),
@@ -296,9 +321,13 @@ class _VarietasTanamanPageState extends State<VarietasTanamanPage> {
                                         borderRadius: BorderRadius.circular(10),
                                       ),
                                       child: Row(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
                                         children: [
-                                          const Icon(Icons.tips_and_updates_rounded, size: 14, color: AppTheme.neonLime),
+                                          const Icon(
+                                              Icons.tips_and_updates_rounded,
+                                              size: 14,
+                                              color: AppTheme.neonLime),
                                           const SizedBox(width: 6),
                                           Expanded(
                                             child: Text(

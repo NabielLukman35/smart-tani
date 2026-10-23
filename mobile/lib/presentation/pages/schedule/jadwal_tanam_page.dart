@@ -19,7 +19,8 @@ class JadwalTanamPage extends StatefulWidget {
 }
 
 class _JadwalTanamPageState extends State<JadwalTanamPage> {
-  int _selectedFilter = 0; // 0: Semua, 1: Hari Ini, 2: Belum Selesai, 3: Selesai
+  int _selectedFilter =
+      0; // 0: Semua, 1: Hari Ini, 2: Belum Selesai, 3: Selesai
   ScheduleSortOption _currentSort = ScheduleSortOption.timeAsc;
   bool _isLoading = true;
   List<Map<String, dynamic>> _schedules = [];
@@ -84,7 +85,13 @@ class _JadwalTanamPageState extends State<JadwalTanamPage> {
         case ScheduleSortOption.timeDesc:
           return bTime.compareTo(aTime);
         case ScheduleSortOption.priority:
-          final pMap = {'Prioritas': 0, 'Panen': 1, 'Terjadwal': 2, 'Mendatang': 3, 'Selesai': 4};
+          final pMap = {
+            'Prioritas': 0,
+            'Panen': 1,
+            'Terjadwal': 2,
+            'Mendatang': 3,
+            'Selesai': 4
+          };
           return (pMap[aStatus] ?? 99).compareTo(pMap[bStatus] ?? 99);
         case ScheduleSortOption.alphabetical:
           return aTitle.compareTo(bTitle);
@@ -115,7 +122,9 @@ class _JadwalTanamPageState extends State<JadwalTanamPage> {
     final lower = title.toLowerCase();
     if (lower.contains('pupuk') || lower.contains('nutrisi')) {
       return Icons.water_drop_rounded;
-    } else if (lower.contains('ph') || lower.contains('ec') || lower.contains('cek')) {
+    } else if (lower.contains('ph') ||
+        lower.contains('ec') ||
+        lower.contains('cek')) {
       return Icons.science_rounded;
     } else if (lower.contains('pangkas') || lower.contains('prun')) {
       return Icons.content_cut_rounded;
@@ -133,7 +142,8 @@ class _JadwalTanamPageState extends State<JadwalTanamPage> {
     if (date == null) return waktuUtc;
 
     final now = DateTime.now();
-    final isToday = date.year == now.year && date.month == now.month && date.day == now.day;
+    final isToday =
+        date.year == now.year && date.month == now.month && date.day == now.day;
     final isTomorrow = date.year == now.year &&
         date.month == now.month &&
         date.day == now.add(const Duration(days: 1)).day;
@@ -263,7 +273,7 @@ class _JadwalTanamPageState extends State<JadwalTanamPage> {
 
   void _showAddScheduleBottomSheet() {
     final titleCtrl = TextEditingController();
-    final locationCtrl = TextEditingController(text: 'Greenhouse A • Tomat Hidroponik');
+    final locationCtrl = TextEditingController();
     DateTime selectedDate = DateTime.now().add(const Duration(hours: 1));
     TimeOfDay selectedTime = TimeOfDay.fromDateTime(selectedDate);
     String selectedPriority = 'Prioritas';
@@ -310,7 +320,8 @@ class _JadwalTanamPageState extends State<JadwalTanamPage> {
                 const SizedBox(height: 16),
                 const Row(
                   children: [
-                    Icon(Icons.add_task_rounded, color: AppTheme.neonLime, size: 22),
+                    Icon(Icons.add_task_rounded,
+                        color: AppTheme.neonLime, size: 22),
                     SizedBox(width: 8),
                     Text(
                       'Tambah Jadwal & Notifikasi Otomatis',
@@ -345,7 +356,8 @@ class _JadwalTanamPageState extends State<JadwalTanamPage> {
                     return ActionChip(
                       label: Text(
                         task,
-                        style: const TextStyle(fontSize: 11, color: AppTheme.creamWhite),
+                        style: const TextStyle(
+                            fontSize: 11, color: AppTheme.creamWhite),
                       ),
                       backgroundColor: const Color(0xFF143B33),
                       side: BorderSide(
@@ -408,14 +420,17 @@ class _JadwalTanamPageState extends State<JadwalTanamPage> {
                           final picked = await showDatePicker(
                             context: context,
                             initialDate: selectedDate,
-                            firstDate: DateTime.now().subtract(const Duration(days: 1)),
-                            lastDate: DateTime.now().add(const Duration(days: 365)),
+                            firstDate: DateTime.now()
+                                .subtract(const Duration(days: 1)),
+                            lastDate:
+                                DateTime.now().add(const Duration(days: 365)),
                           );
                           if (picked != null) {
                             setModalState(() => selectedDate = picked);
                           }
                         },
-                        icon: const Icon(Icons.calendar_today_rounded, size: 16),
+                        icon:
+                            const Icon(Icons.calendar_today_rounded, size: 16),
                         label: Text(
                           '${selectedDate.day}/${selectedDate.month}/${selectedDate.year}',
                           style: const TextStyle(fontSize: 12),
@@ -474,9 +489,12 @@ class _JadwalTanamPageState extends State<JadwalTanamPage> {
                     ),
                   ),
                   items: const [
-                    DropdownMenuItem(value: 'Prioritas', child: Text('Prioritas Utama')),
-                    DropdownMenuItem(value: 'Terjadwal', child: Text('Terjadwal')),
-                    DropdownMenuItem(value: 'Mendatang', child: Text('Mendatang')),
+                    DropdownMenuItem(
+                        value: 'Prioritas', child: Text('Prioritas Utama')),
+                    DropdownMenuItem(
+                        value: 'Terjadwal', child: Text('Terjadwal')),
+                    DropdownMenuItem(
+                        value: 'Mendatang', child: Text('Mendatang')),
                     DropdownMenuItem(value: 'Panen', child: Text('Panen')),
                   ],
                   onChanged: (val) {
@@ -499,7 +517,8 @@ class _JadwalTanamPageState extends State<JadwalTanamPage> {
                       if (title.isEmpty) {
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
-                            content: Text('Masukkan nama kegiatan terlebih dahulu.'),
+                            content:
+                                Text('Masukkan nama kegiatan terlebih dahulu.'),
                             behavior: SnackBarBehavior.floating,
                           ),
                         );
@@ -529,10 +548,12 @@ class _JadwalTanamPageState extends State<JadwalTanamPage> {
                       });
 
                       // 2. Jadwalkan Notifikasi Pengingat Otomatis
-                      await NotificationService.instance.schedulePlantReminderNotification(
+                      await NotificationService.instance
+                          .schedulePlantReminderNotification(
                         id: newId,
                         title: title,
-                        body: '📍 $location • Waktunya merawat tanaman sesuai jadwal!',
+                        body:
+                            '📍 $location • Waktunya merawat tanaman sesuai jadwal!',
                         scheduledDate: finalDateTime,
                       );
 
@@ -615,7 +636,8 @@ class _JadwalTanamPageState extends State<JadwalTanamPage> {
 
               // Filter Chips
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                 child: SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
                   child: Row(
@@ -636,7 +658,8 @@ class _JadwalTanamPageState extends State<JadwalTanamPage> {
               Expanded(
                 child: _isLoading
                     ? const Center(
-                        child: CircularProgressIndicator(color: AppTheme.neonLime),
+                        child:
+                            CircularProgressIndicator(color: AppTheme.neonLime),
                       )
                     : list.isEmpty
                         ? Center(
@@ -646,7 +669,8 @@ class _JadwalTanamPageState extends State<JadwalTanamPage> {
                                 Icon(
                                   Icons.event_available_rounded,
                                   size: 54,
-                                  color: AppTheme.textGrey.withValues(alpha: 0.4),
+                                  color:
+                                      AppTheme.textGrey.withValues(alpha: 0.4),
                                 ),
                                 const SizedBox(height: 12),
                                 const Text(
@@ -662,16 +686,20 @@ class _JadwalTanamPageState extends State<JadwalTanamPage> {
                           )
                         : ListView.builder(
                             physics: const BouncingScrollPhysics(),
-                            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 20, vertical: 4),
                             itemCount: list.length,
                             itemBuilder: (ctx, idx) {
                               final item = list[idx];
                               final id = item['id'] as int? ?? idx;
-                              final title = item['jenis_perawatan'] as String? ?? 'Perawatan Tanaman';
+                              final title =
+                                  item['jenis_perawatan'] as String? ??
+                                      'Perawatan Tanaman';
                               final location = item['catatan'] as String? ??
                                   '${item['nama_greenhouse'] ?? 'Greenhouse A'} • ${item['nama_varietas'] ?? 'Melon'}';
                               final waktuUtc = item['waktu_utc'] as String?;
-                              final status = item['status'] as String? ?? 'Terjadwal';
+                              final status =
+                                  item['status'] as String? ?? 'Terjadwal';
                               final isDone = status == 'Selesai';
                               final statusColor = _getStatusColor(status);
                               final icon = _getScheduleIcon(title);
@@ -687,7 +715,9 @@ class _JadwalTanamPageState extends State<JadwalTanamPage> {
                                     color: Colors.red.withValues(alpha: 0.8),
                                     borderRadius: BorderRadius.circular(18),
                                   ),
-                                  child: const Icon(Icons.delete_outline_rounded, color: Colors.white),
+                                  child: const Icon(
+                                      Icons.delete_outline_rounded,
+                                      color: Colors.white),
                                 ),
                                 onDismissed: (_) => _deleteSchedule(id),
                                 child: Container(
@@ -697,14 +727,16 @@ class _JadwalTanamPageState extends State<JadwalTanamPage> {
                                     color: AppTheme.cardSurface,
                                     borderRadius: BorderRadius.circular(18),
                                     border: Border.all(
-                                      color: statusColor.withValues(alpha: 0.35),
+                                      color:
+                                          statusColor.withValues(alpha: 0.35),
                                       width: 1.2,
                                     ),
                                   ),
                                   child: Row(
                                     children: [
                                       GestureDetector(
-                                        onTap: () => _toggleScheduleStatus(id, isDone),
+                                        onTap: () =>
+                                            _toggleScheduleStatus(id, isDone),
                                         child: Container(
                                           width: 32,
                                           height: 32,
@@ -730,7 +762,8 @@ class _JadwalTanamPageState extends State<JadwalTanamPage> {
                                       const SizedBox(width: 14),
                                       Expanded(
                                         child: Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
                                           children: [
                                             Text(
                                               title,
@@ -759,13 +792,15 @@ class _JadwalTanamPageState extends State<JadwalTanamPage> {
                                                 Icon(
                                                   Icons.access_time_rounded,
                                                   size: 12,
-                                                  color: AppTheme.pastelLime.withValues(alpha: 0.7),
+                                                  color: AppTheme.pastelLime
+                                                      .withValues(alpha: 0.7),
                                                 ),
                                                 const SizedBox(width: 4),
                                                 Text(
                                                   _formatTimeDisplay(waktuUtc),
                                                   style: TextStyle(
-                                                    color: AppTheme.pastelLime.withValues(alpha: 0.8),
+                                                    color: AppTheme.pastelLime
+                                                        .withValues(alpha: 0.8),
                                                     fontSize: 11,
                                                     fontWeight: FontWeight.w500,
                                                   ),
@@ -779,13 +814,16 @@ class _JadwalTanamPageState extends State<JadwalTanamPage> {
                                         padding: const EdgeInsets.symmetric(
                                             horizontal: 8, vertical: 4),
                                         decoration: BoxDecoration(
-                                          color: statusColor.withValues(alpha: 0.15),
-                                          borderRadius: BorderRadius.circular(8),
+                                          color: statusColor.withValues(
+                                              alpha: 0.15),
+                                          borderRadius:
+                                              BorderRadius.circular(8),
                                         ),
                                         child: Row(
                                           mainAxisSize: MainAxisSize.min,
                                           children: [
-                                            Icon(icon, size: 12, color: statusColor),
+                                            Icon(icon,
+                                                size: 12, color: statusColor),
                                             const SizedBox(width: 4),
                                             Text(
                                               status,
