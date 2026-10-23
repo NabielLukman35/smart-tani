@@ -109,8 +109,7 @@ class HomePage extends StatelessWidget {
         ),
         const SizedBox(width: 14),
         const SmartTaniLogo(
-          size: 32,
-          showBadge: true,
+          size: 38,
         ),
       ],
     );

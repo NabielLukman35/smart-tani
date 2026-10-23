@@ -231,10 +231,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       ],
                     ),
                     const SmartTaniLogo(
-                      size: 26,
-                      variant: SmartTaniLogoVariant.neonLime,
-                      showBadge: true,
-                      hasGlow: false,
+                      size: 34,
                     ),
                   ],
                 ),

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../../core/theme/app_theme.dart';
 
 enum SmartTaniLogoVariant {
   neonLime,
@@ -7,62 +6,32 @@ enum SmartTaniLogoVariant {
 }
 
 /// Logo Resmi Smart Tani TaniGreen
-/// Menggunakan aset asli tanpa distorsi atau bayangan berlebihan
+/// Menampilkan murni aset gambar asli yang diunggah pengguna tanpa kode painter atau badge buatan
 class SmartTaniLogo extends StatelessWidget {
   final double size;
-  final SmartTaniLogoVariant variant;
-  final bool showBadge;
-  final bool hasGlow;
+  final double? width;
+  final double? height;
+  final BoxFit fit;
 
   const SmartTaniLogo({
     super.key,
     this.size = 48,
-    this.variant = SmartTaniLogoVariant.neonLime,
-    this.showBadge = true,
-    this.hasGlow = false,
+    this.width,
+    this.height,
+    this.fit = BoxFit.contain,
+    // Parameter kompatibilitas agar tidak merusak pemanggilan di layar lain
+    SmartTaniLogoVariant? variant,
+    bool? showBadge,
+    bool? hasGlow,
   });
 
   @override
   Widget build(BuildContext context) {
-    final imageWidget = Image.asset(
+    return Image.asset(
       'assets/images/logo.png',
-      width: size,
-      height: size,
-      fit: BoxFit.contain,
-      errorBuilder: (context, error, stackTrace) {
-        return Icon(
-          Icons.eco_rounded,
-          size: size,
-          color: AppTheme.accent,
-        );
-      },
-    );
-
-    if (!showBadge) {
-      return imageWidget;
-    }
-
-    final boxSize = size * 1.35;
-    final borderRadius = BorderRadius.circular(12);
-
-    return Container(
-      width: boxSize,
-      height: boxSize,
-      decoration: BoxDecoration(
-        color: AppTheme.panel,
-        borderRadius: borderRadius,
-        border: Border.all(
-          color: AppTheme.borderQuiet,
-          width: 1,
-        ),
-      ),
-      child: Center(
-        child: SizedBox(
-          width: size,
-          height: size,
-          child: imageWidget,
-        ),
-      ),
+      width: width ?? size,
+      height: height ?? size,
+      fit: fit,
     );
   }
 }

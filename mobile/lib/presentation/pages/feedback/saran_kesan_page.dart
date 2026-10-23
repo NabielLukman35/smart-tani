@@ -123,10 +123,7 @@ class _SaranKesanPageState extends State<SaranKesanPage> {
                       ],
                     ),
                     const SmartTaniLogo(
-                      size: 26,
-                      variant: SmartTaniLogoVariant.neonLime,
-                      showBadge: true,
-                      hasGlow: false,
+                      size: 34,
                     ),
                   ],
                 ),

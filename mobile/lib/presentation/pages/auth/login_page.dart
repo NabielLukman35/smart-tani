@@ -162,8 +162,7 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
             mainAxisSize: MainAxisSize.min,
             children: [
               SmartTaniLogo(
-                size: 64,
-                showBadge: true,
+                size: 84,
               ),
               SizedBox(height: 20),
               Text(
@@ -192,8 +191,7 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
             mainAxisSize: MainAxisSize.min,
             children: [
               SmartTaniLogo(
-                size: 48,
-                showBadge: true,
+                size: 56,
               ),
               SizedBox(height: 24),
               SizedBox(
@@ -234,8 +232,7 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                 // ── Brand Header ──
                 const Center(
                   child: SmartTaniLogo(
-                    size: 44,
-                    showBadge: true,
+                    size: 52,
                   ),
                 ),
                 const SizedBox(height: 16),
